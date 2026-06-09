@@ -12,9 +12,7 @@ Jika GitHub Pages sudah diaktifkan, website dapat diakses melalui link berikut:
 
 https://aidilfarhanr-sketch.github.io/Sistem-Penggajian/
 
-Jika link belum bisa dibuka, aktifkan dulu GitHub Pages melalui:
 
-`Settings` → `Pages` → `Build and deployment` → `Deploy from a branch` → pilih branch `main` dan folder `/root` → `Save`.
 
 ---
 
