@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rarestore— Sistem Penggajian</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sky:#0ea5e9;--sky-d:#0369a1;--sky-l:#bae6fd;--sky-xl:#e0f2fe;
+  --navy:#0c2d4e;--navy2:#1a3f5c;
+  --white:#fff;--gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;
+  --gray400:#94a3b8;--gray500:#64748b;--gray600:#475569;--gray700:#334155;
+  --green:#22c55e;--green-d:#15803d;--green-l:#dcfce7;
+  --amber:#f59e0b;--amber-d:#b45309;--amber-l:#fef3c7;
+  --red:#ef4444;--red-d:#b91c1c;--red-l:#fee2e2;
+  --purple:#8b5cf6;--purple-l:#ede9fe;--purple-d:#6d28d9;
+  --teal:#14b8a6;--teal-l:#ccfbf1;--teal-d:#0f766e;
+  --font:'DM Sans',sans-serif;--display:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
+  --radius:14px;--radius-sm:8px;--radius-lg:20px;
+  --shadow:0 4px 24px rgba(14,165,233,0.08);
+  --shadow-md:0 8px 32px rgba(14,165,233,0.14);
+  --shadow-lg:0 20px 60px rgba(0,0,0,0.15);
+  --trans:all 0.35s cubic-bezier(0.34,1.2,0.64,1);
+}
+html,body{height:100%;overflow:hidden;font-family:var(--font);}
+body{background:var(--gray50);}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--sky-l);border-radius:4px}
+
+/* ===== PARTICLES ===== */
+#login-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.particle{position:absolute;border-radius:50%;animation:float-particle linear infinite;opacity:0;}
+@keyframes float-particle{
+  0%{transform:translateY(100vh) scale(0);opacity:0}
+  10%{opacity:1}
+  90%{opacity:1}
+  100%{transform:translateY(-10vh) scale(1);opacity:0}
+}
+
+/* ===== LOGIN ===== */
+#login-screen{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#0c2d4e 0%,#0369a1 55%,#0ea5e9 100%);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity 0.7s ease,transform 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+#login-screen.hiding{opacity:0;transform:scale(1.05);}
+.login-bg-circles{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.lc{position:absolute;border-radius:50%;background:rgba(255,255,255,0.05);}
+.lc1{width:500px;height:500px;top:-150px;right:-100px;animation:floatA 10s ease-in-out infinite;}
+.lc2{width:300px;height:300px;bottom:-80px;left:-80px;animation:floatB 7s ease-in-out infinite;}
+.lc3{width:200px;height:200px;top:40%;left:5%;animation:floatC 12s ease-in-out infinite;}
+.lc4{width:120px;height:120px;top:20%;right:25%;animation:floatA 8s ease-in-out infinite reverse;}
+@keyframes floatA{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-30px) rotate(8deg)}}
+@keyframes floatB{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(20px) scale(1.05)}}
+@keyframes floatC{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-15px) rotate(-5deg)}}
+
+.login-card{
+  position:relative;z-index:2;
+  background:rgba(255,255,255,0.09);
+  backdrop-filter:blur(32px);
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:28px;
+  padding:48px 44px;
+  width:400px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.15);
+  animation:loginIn 0.9s cubic-bezier(0.34,1.2,0.64,1) both;
+}
+@keyframes loginIn{from{opacity:0;transform:translateY(40px) scale(0.93)}to{opacity:1;transform:none}}
+
+.login-logo {
+  width: 68px;
+  height: 68px;
+  background: transparent;           
+  border: none;                      
+  border-radius: 50%;                
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 24px;
+  animation: spinIn 1s cubic-bezier(0.34,1.4,0.64,1) 0.3s both;
+  box-shadow: none;                  
+}
+@keyframes spinIn{from{transform:rotateY(90deg) scale(0.5)}to{transform:none}}
+
+.login-title{color:white;text-align:center;font-family:var(--display);font-size:28px;font-weight:800;margin-bottom:4px;letter-spacing:-0.5px;}
+.login-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,0.7);margin:0 auto 28px;width:fit-content;}
+.login-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite;}
+
+.login-field{margin-bottom:18px;position:relative;}
+.login-label{color:rgba(255,255,255,0.7);font-size:11px;font-weight:600;margin-bottom:7px;display:block;letter-spacing:0.8px;text-transform:uppercase;}
+.login-input-wrap{position:relative;}
+.login-input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;}
+.login-input{
+  width:100%;padding:13px 16px 13px 42px;
+  background:rgba(255,255,255,0.08);
+  border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:14px;
+  color:white;font-family:var(--font);font-size:14px;
+  outline:none;transition:all 0.3s ease;
+}
+.login-input::placeholder{color:rgba(255,255,255,0.3)}
+.login-input:focus{border-color:rgba(255,255,255,0.45);background:rgba(255,255,255,0.13);box-shadow:0 0 0 4px rgba(255,255,255,0.06);}
+.login-input.error{border-color:#ef4444;animation:shake 0.4s ease;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+.login-btn{
+  width:100%;padding:15px;margin-top:10px;
+  background:white;color:var(--sky-d);
+  border:none;border-radius:14px;
+  font-family:var(--display);font-size:15px;font-weight:800;
+  cursor:pointer;transition:var(--trans);
+  position:relative;overflow:hidden;letter-spacing:0.2px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.2);
+}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,0.25);}
+.login-btn:active{transform:scale(0.97);}
+.login-btn-shine{
+  position:absolute;top:-50%;left:-60%;width:40%;height:200%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+  transform:skewX(-20deg);
+  animation:shine 3s ease-in-out infinite 1s;
+}
+@keyframes shine{0%,100%{left:-60%}50%{left:120%}}
+.login-err{color:#fca5a5;font-size:12px;text-align:center;margin-top:12px;height:18px;transition:opacity 0.3s;}
+
+/* ===== MAIN APP ===== */
+#app{display:flex;height:100vh;opacity:0;transition:opacity 0.5s ease;}
+#app.visible{opacity:1;}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  width:230px;flex-shrink:0;
+  background:linear-gradient(180deg,var(--navy) 0%,#0d3358 100%);
+  display:flex;flex-direction:column;
+  padding:0;overflow:hidden;
+  position:relative;
+  box-shadow:4px 0 24px rgba(0,0,0,0.15);
+}
+.sidebar::before{
+  content:'';position:absolute;
+  width:250px;height:250px;
+  background:radial-gradient(circle,rgba(14,165,233,0.12),transparent 70%);
+  top:-60px;right:-80px;pointer-events:none;
+}
+.sidebar::after{
+  content:'';position:absolute;
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(139,92,246,0.08),transparent 70%);
+  bottom:-60px;left:-60px;pointer-events:none;
+}
+
+.sidebar-logo{
+  padding:24px 20px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.sidebar-icon{
+  width:42px;height:42px;
+  background:linear-gradient(135deg,var(--sky),var(--sky-d));
+  border-radius:13px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+  box-shadow:0 4px 12px rgba(14,165,233,0.35);
+}
+.sidebar-brand{color:white;font-family:var(--display);font-weight:800;font-size:17px;line-height:1.1;}
+.sidebar-brand span{display:block;color:rgba(255,255,255,0.35);font-size:10px;font-weight:400;font-family:var(--font);margin-top:2px;}
+
+.nav-list{flex:1;padding:14px 10px;overflow-y:auto;}
+.nav-section-label{
+  color:rgba(255,255,255,0.25);font-size:10px;font-weight:700;
+  letter-spacing:1.2px;text-transform:uppercase;
+  padding:0 10px;margin:18px 0 8px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:11px;
+  padding:10px 12px;border-radius:11px;
+  color:rgba(255,255,255,0.5);font-size:13px;font-weight:500;
+  cursor:pointer;transition:var(--trans);margin-bottom:1px;
+  position:relative;overflow:hidden;
+}
+.nav-item::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background 0.3s;}
+.nav-item:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.06);}
+.nav-item.active{
+  color:white;
+  background:linear-gradient(135deg,rgba(14,165,233,0.25),rgba(14,165,233,0.1));
+  box-shadow:inset 0 0 0 1px rgba(14,165,233,0.2);
+}
+.nav-item.active::after{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:22px;background:linear-gradient(180deg,var(--sky),var(--sky-d));
+  border-radius:0 3px 3px 0;
+}
+.nav-ripple{
+  position:absolute;border-radius:50%;background:rgba(255,255,255,0.15);
+  width:0;height:0;transform:translate(-50%,-50%);
+  animation:ripple 0.5s ease-out forwards;pointer-events:none;
+}
+@keyframes ripple{to{width:200px;height:200px;opacity:0}}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.nav-badge{
+  margin-left:auto;background:var(--sky);color:white;
+  font-size:9px;font-weight:700;border-radius:10px;
+  padding:2px 6px;min-width:18px;text-align:center;
+}
+
+.sidebar-user{
+  padding:14px 16px;border-top:1px solid rgba(255,255,255,0.06);
+  display:flex;align-items:center;gap:10px;
+}
+.user-avatar{
+  width:36px;height:36px;border-radius:11px;
+  background:linear-gradient(135deg,var(--sky),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-weight:800;font-size:13px;
+  box-shadow:0 3px 10px rgba(14,165,233,0.3);
+}
+.user-info{flex:1;min-width:0;}
+.user-name{color:white;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-role{color:rgba(255,255,255,0.35);font-size:10px;margin-top:1px;}
+.logout-btn{
+  width:30px;height:30px;border-radius:9px;border:none;
+  background:rgba(255,255,255,0.05);cursor:pointer;
+  color:rgba(255,255,255,0.35);font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  transition:var(--trans);flex-shrink:0;
+}
+.logout-btn:hover{background:rgba(239,68,68,0.18);color:#ef4444;}
+
+/* ===== MAIN CONTENT ===== */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+.topbar{
+  height:62px;
+  background:rgba(255,255,255,0.95);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--gray100);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;flex-shrink:0;
+  position:relative;z-index:10;
+  box-shadow:0 1px 12px rgba(0,0,0,0.04);
+}
+.topbar-title{font-family:var(--display);font-size:17px;font-weight:800;color:var(--gray700);letter-spacing:-0.3px;}
+.topbar-meta{font-size:11px;color:var(--gray400);margin-top:2px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.topbar-date{
+  background:linear-gradient(135deg,var(--sky-xl),#f0f9ff);
+  color:var(--sky-d);border:1px solid var(--sky-l);
+  font-size:11px;font-weight:700;padding:6px 14px;border-radius:10px;
+  font-family:var(--mono);
+}
+.topbar-btn{
+  width:36px;height:36px;border-radius:10px;border:1px solid var(--gray100);
+  background:white;cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:var(--trans);color:var(--gray500);
+}
+.topbar-btn:hover{background:var(--sky-xl);border-color:var(--sky-l);color:var(--sky-d);}
+.pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px;animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,0.4)}50%{opacity:0.7;box-shadow:0 0 0 4px rgba(34,197,94,0)}}
+
+.content-area{flex:1;overflow-y:auto;padding:24px;}
+
+/* ===== PAGES ===== */
+.page{display:none;}
+.page.active{display:block;animation:pageIn 0.45s cubic-bezier(0.34,1.1,0.64,1) both;}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ===== CARDS ===== */
+.card{
+  background:white;border-radius:var(--radius);
+  border:1px solid var(--gray100);
+  overflow:hidden;transition:var(--trans);
+}
+.card:hover{box-shadow:var(--shadow);}
+.card-header{
+  padding:16px 20px;border-bottom:1px solid var(--gray100);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--gray700);}
+.card-body{padding:16px 20px;}
+
+/* ===== STATS GRID ===== */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.stat-card{
+  background:white;border-radius:var(--radius);
+  padding:20px;border:1px solid var(--gray100);
+  position:relative;overflow:hidden;
+  transition:var(--trans);cursor:default;
+  animation:statIn 0.6s cubic-bezier(0.34,1.2,0.64,1) both;
+}
+.stat-card:nth-child(1){animation-delay:0.05s}
+.stat-card:nth-child(2){animation-delay:0.12s}
+.stat-card:nth-child(3){animation-delay:0.19s}
+.stat-card:nth-child(4){animation-delay:0.26s}
+@keyframes statIn{from{opacity:0;transform:translateY(20px) scale(0.94)}to{opacity:1;transform:none}}
+.stat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:transparent;}
+.stat-bg{position:absolute;inset:0;opacity:0.04;transition:opacity 0.3s;}
+.stat-card:hover .stat-bg{opacity:0.07;}
+.stat-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0;}
+.stat-icon-wrap{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;margin-bottom:14px;
+}
+.stat-label{font-size:11px;color:var(--gray400);font-weight:600;text-transform:uppercase;letter-spacing:0.6px;}
+.stat-value{font-size:22px;font-weight:800;color:var(--gray700);margin-top:4px;font-family:var(--mono);}
+.stat-sub{font-size:11px;color:var(--gray400);margin-top:4px;}
+.stat-trend{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;margin-top:6px;}
+.trend-up{background:var(--green-l);color:var(--green-d);}
+.trend-dn{background:var(--red-l);color:var(--red-d);}
+
+/* ===== GRID LAYOUTS ===== */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+
+/* ===== EMPLOYEE CARDS ===== */
+.emp-card{
+  background:white;border-radius:var(--radius);border:1px solid var(--gray100);
+  padding:20px;text-align:center;
+  transition:var(--trans);cursor:pointer;
+  animation:empIn 0.4s cubic-bezier(0.34,1.2,0.64,1) both;
+  position:relative;overflow:hidden;
+}
+.emp-card:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(14,165,233,0.15);border-color:var(--sky-l);}
+@keyframes empIn{from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:none}}
+.emp-card-bg{position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;opacity:0.06;transition:all 0.4s;}
+.emp-card:hover .emp-card-bg{opacity:0.12;transform:scale(1.4);}
+
+.avatar{
+  width:56px;height:56px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:18px;margin:0 auto 14px;
+  position:relative;transition:var(--trans);
+}
+.emp-card:hover .avatar{transform:scale(1.1);}
+.emp-name{font-family:var(--display);font-size:14px;font-weight:800;color:var(--gray700);}
+.emp-role{font-size:11px;color:var(--gray400);margin-top:3px;font-weight:500;}
+.emp-salary{font-family:var(--mono);font-size:13px;color:var(--sky-d);font-weight:700;margin-top:10px;background:var(--sky-xl);border-radius:8px;padding:5px 10px;display:inline-block;}
+.emp-chips{display:flex;gap:4px;justify-content:center;margin-top:10px;flex-wrap:wrap;}
+
+/* ===== BADGES / CHIPS ===== */
+.chip{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;}
+.chip-h{background:var(--green-l);color:var(--green-d);}
+.chip-s{background:var(--amber-l);color:var(--amber-d);}
+.chip-a{background:var(--red-l);color:var(--red-d);}
+.chip-blue{background:var(--sky-xl);color:var(--sky-d);}
+.chip-purple{background:var(--purple-l);color:var(--purple-d);}
+.chip-teal{background:var(--teal-l);color:var(--teal-d);}
+
+/* ===== ATTENDANCE TABLE ===== */
+.att-table{width:100%;border-collapse:collapse;font-size:13px;}
+.att-table th{background:var(--gray50);padding:11px 16px;text-align:left;font-weight:700;color:var(--gray500);font-size:11px;letter-spacing:0.6px;border-bottom:2px solid var(--gray100);text-transform:uppercase;}
+.att-table td{padding:13px 16px;border-bottom:1px solid var(--gray100);color:var(--gray600);transition:background 0.2s;}
+.att-table tr{animation:rowIn 0.3s ease both;}
+@keyframes rowIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.att-table tr:hover td{background:var(--sky-xl);}
+.att-table tr:last-child td{border-bottom:none;}
+
+.att-btn-group{display:flex;gap:6px;}
+.att-btn{padding:6px 13px;border:1.5px solid transparent;border-radius:8px;font-family:var(--font);font-size:11px;font-weight:700;cursor:pointer;transition:var(--trans);position:relative;overflow:hidden;}
+.att-btn:active{transform:scale(0.94);}
+.btn-h{background:var(--green-l);color:var(--green-d);}
+.btn-h.sel{background:var(--green);color:white;box-shadow:0 3px 10px rgba(34,197,94,0.35);}
+.btn-s{background:var(--amber-l);color:var(--amber-d);}
+.btn-s.sel{background:var(--amber);color:white;box-shadow:0 3px 10px rgba(245,158,11,0.35);}
+.btn-a{background:var(--red-l);color:var(--red-d);}
+.btn-a.sel{background:var(--red);color:white;box-shadow:0 3px 10px rgba(239,68,68,0.35);}
+
+/* ===== PAYROLL ===== */
+.payroll-card{
+  background:white;border-radius:var(--radius);border:1px solid var(--gray100);
+  overflow:hidden;margin-bottom:12px;
+  animation:payIn 0.4s cubic-bezier(0.34,1.1,0.64,1) both;
+  transition:var(--trans);
+}
+.payroll-card:hover{box-shadow:var(--shadow-md);border-color:var(--sky-l);}
+@keyframes payIn{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.payroll-header{
+  background:linear-gradient(135deg,var(--sky-xl),var(--gray50));
+  padding:16px 20px;display:flex;align-items:center;gap:14px;
+  border-bottom:1px solid var(--gray100);
+}
+.payroll-body{padding:14px 20px;}
+.payroll-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed var(--gray100);}
+.payroll-row:last-child{border-bottom:none;}
+.payroll-row.deduct{color:var(--red-d);}
+.payroll-row.net{color:var(--green-d);font-weight:800;font-size:15px;border-top:2px solid var(--sky-l);margin-top:4px;padding-top:12px;}
+.money{font-family:var(--mono);font-size:13px;}
+
+/* ===== HISTORY ===== */
+.hist-item{
+  background:white;border-radius:var(--radius);border:1px solid var(--gray100);
+  padding:18px 22px;margin-bottom:12px;
+  animation:histIn 0.4s cubic-bezier(0.34,1.1,0.64,1) both;
+  transition:var(--trans);
+}
+.hist-item:hover{border-color:var(--sky-l);box-shadow:var(--shadow-md);}
+@keyframes histIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ===== BUTTONS ===== */
+.btn{
+  padding:9px 20px;border-radius:10px;border:none;
+  font-family:var(--font);font-size:13px;font-weight:700;
+  cursor:pointer;transition:var(--trans);display:inline-flex;align-items:center;gap:7px;
+  position:relative;overflow:hidden;
+}
+.btn:active{transform:scale(0.96);}
+.btn-primary{background:linear-gradient(135deg,var(--sky),var(--sky-d));color:white;box-shadow:0 4px 14px rgba(14,165,233,0.3);}
+.btn-primary:hover{filter:brightness(1.08);box-shadow:0 6px 20px rgba(14,165,233,0.4);}
+.btn-success{background:linear-gradient(135deg,var(--green),var(--green-d));color:white;box-shadow:0 4px 14px rgba(34,197,94,0.3);}
+.btn-success:hover{filter:brightness(1.08);}
+.btn-danger{background:linear-gradient(135deg,var(--red),var(--red-d));color:white;}
+.btn-ghost{background:var(--gray100);color:var(--gray600);}
+.btn-ghost:hover{background:var(--gray200);}
+.btn-outline{background:transparent;border:1.5px solid var(--sky-l);color:var(--sky-d);}
+.btn-outline:hover{background:var(--sky-xl);}
+.btn-purple{background:linear-gradient(135deg,var(--purple),var(--purple-d));color:white;}
+.btn-sm{padding:6px 13px;font-size:11px;border-radius:8px;}
+.btn-full{width:100%;justify-content:center;padding:12px;}
+
+/* ===== PROGRESS BAR ===== */
+.progress{height:6px;background:var(--gray100);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(0.34,1.1,0.64,1);}
+
+/* ===== INPUTS ===== */
+.input{
+  width:100%;padding:10px 14px;
+  border:1.5px solid var(--gray200);border-radius:10px;
+  font-family:var(--font);font-size:13px;color:var(--gray700);
+  background:white;outline:none;transition:var(--trans);
+}
+.input:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(14,165,233,0.1);}
+.input-mono{font-family:var(--mono);}
+.form-group{margin-bottom:14px;}
+.form-label{display:block;font-size:11px;font-weight:700;color:var(--gray500);margin-bottom:5px;letter-spacing:0.5px;text-transform:uppercase;}
+
+/* ===== MODAL ===== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(12,45,78,0.6);
+  backdrop-filter:blur(6px);z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.3s ease;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{
+  background:white;border-radius:22px;
+  width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;
+  transform:scale(0.9) translateY(24px);
+  transition:transform 0.4s cubic-bezier(0.34,1.2,0.64,1);
+  box-shadow:0 32px 80px rgba(0,0,0,0.25);
+}
+.modal-overlay.open .modal{transform:none;}
+.modal-header{padding:22px 26px 18px;border-bottom:1px solid var(--gray100);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:var(--display);font-size:17px;font-weight:800;color:var(--gray700);}
+.modal-close{width:34px;height:34px;border-radius:9px;border:none;background:var(--gray100);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:var(--trans);}
+.modal-close:hover{background:var(--red-l);color:var(--red-d);transform:rotate(90deg);}
+.modal-body{padding:22px 26px;}
+.modal-footer{padding:18px 26px;border-top:1px solid var(--gray100);display:flex;gap:8px;justify-content:flex-end;}
+
+/* ===== SLIP GAJI ===== */
+.slip-print{
+  background:white;border-radius:var(--radius-lg);
+  border:2px solid var(--sky-l);overflow:hidden;margin-bottom:8px;
+}
+.slip-header{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--sky-d) 100%);
+  color:white;padding:24px 28px;position:relative;overflow:hidden;
+}
+.slip-header::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05);}
+.slip-header::after{content:'';position:absolute;bottom:-20px;left:60px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.04);}
+.slip-company{font-family:var(--display);font-size:20px;font-weight:800;position:relative;z-index:1;}
+.slip-subtitle{font-size:11px;opacity:0.65;margin-top:3px;position:relative;z-index:1;}
+.slip-period-badge{
+  background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);
+  border-radius:8px;padding:6px 14px;
+  font-size:12px;font-weight:700;display:inline-block;position:relative;z-index:1;
+}
+.slip-body{padding:22px 28px;}
+.slip-emp-section{
+  background:linear-gradient(135deg,var(--sky-xl),#f8fbff);
+  border-radius:14px;padding:16px 18px;margin-bottom:20px;
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  border:1px solid var(--sky-l);
+}
+.slip-field label{font-size:10px;color:var(--gray400);font-weight:700;letter-spacing:0.7px;text-transform:uppercase;}
+.slip-field p{font-size:13px;font-weight:700;color:var(--gray700);margin-top:3px;}
+.slip-table{width:100%;border-collapse:collapse;}
+.slip-table th{background:var(--gray50);padding:9px 14px;font-size:11px;font-weight:700;color:var(--gray500);letter-spacing:0.5px;border-bottom:2px solid var(--gray200);text-transform:uppercase;}
+.slip-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--gray100);}
+.slip-table tr:last-child td{border-bottom:none;}
+.slip-total{
+  margin-top:14px;
+  background:linear-gradient(135deg,#e0f9f0,var(--sky-xl));
+  border-radius:14px;padding:16px 20px;border:1px solid rgba(34,197,94,0.2);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.slip-total-label{font-size:12px;color:var(--gray500);font-weight:700;letter-spacing:0.3px;}
+.slip-total-value{font-family:var(--mono);font-size:22px;font-weight:800;color:var(--green-d);}
+.slip-footer{padding:14px 28px;border-top:1px solid var(--gray100);background:var(--gray50);text-align:center;font-size:11px;color:var(--gray400);font-style:italic;}
+
+/* ===== CHART CONTAINERS ===== */
+.chart-container{position:relative;height:240px;padding:8px 0;}
+.chart-mini{position:relative;height:180px;}
+.chart-lg{position:relative;height:280px;}
+
+/* ===== CALENDAR ATTENDANCE ===== */
+.att-calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px;}
+.cal-day-label{font-size:10px;font-weight:700;color:var(--gray400);text-align:center;padding:5px 0;text-transform:uppercase;letter-spacing:0.5px;}
+.cal-day{
+  aspect-ratio:1;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;cursor:default;transition:all 0.2s cubic-bezier(0.34,1.3,0.64,1);
+}
+.cal-day:hover{transform:scale(1.2);z-index:1;position:relative;}
+.cal-h{background:var(--green-l);color:var(--green-d);}
+.cal-s{background:var(--amber-l);color:var(--amber-d);}
+.cal-a{background:var(--red-l);color:var(--red-d);}
+.cal-empty{background:var(--gray100);color:var(--gray300);}
+.cal-future{background:var(--gray50);color:var(--gray200);}
+.cal-today{outline:2px solid var(--sky);outline-offset:1px;}
+
+/* ===== TOAST ===== */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  background:var(--navy);color:white;
+  padding:13px 22px;border-radius:13px;
+  font-size:13px;font-weight:700;
+  box-shadow:0 12px 40px rgba(0,0,0,0.25);
+  transform:translateY(70px) scale(0.9);opacity:0;
+  transition:all 0.45s cubic-bezier(0.34,1.3,0.64,1);
+  pointer-events:none;max-width:320px;
+  display:flex;align-items:center;gap:10px;
+}
+.toast.show{transform:translateY(0) scale(1);opacity:1;}
+.toast.toast-success{background:linear-gradient(135deg,#16a34a,#15803d);}
+.toast.toast-error{background:linear-gradient(135deg,#dc2626,#b91c1c);}
+.toast.toast-info{background:linear-gradient(135deg,var(--navy),var(--sky-d));}
+
+/* ===== SECTION TITLE ===== */
+.section-title{
+  font-family:var(--display);font-size:16px;font-weight:800;color:var(--gray700);
+  margin-bottom:16px;display:flex;align-items:center;gap:8px;letter-spacing:-0.3px;
+}
+.section-title .dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--sky-d));flex-shrink:0;}
+
+/* ===== MISC ===== */
+.flex{display:flex;}.gap8{gap:8px;}.gap12{gap:12px;}.gap16{gap:16px;}
+.between{justify-content:space-between;}.center{align-items:center;}
+.mb8{margin-bottom:8px;}.mb12{margin-bottom:12px;}.mb16{margin-bottom:16px;}.mb20{margin-bottom:20px;}.mb24{margin-bottom:24px;}
+.mt8{margin-top:8px;}.mt12{margin-top:12px;}.mt16{margin-top:16px;}
+.text-sm{font-size:12px;}.text-xs{font-size:11px;}.text-muted{color:var(--gray400);}
+.fw600{font-weight:600;}.fw700{font-weight:700;}.fw800{font-weight:800;}
+.empty{text-align:center;padding:50px 20px;color:var(--gray400);font-size:13px;}
+.empty-icon{font-size:40px;margin-bottom:10px;}
+
+/* ===== ABSENSI DATE PICKER ===== */
+.date-nav{display:flex;align-items:center;gap:12px;}
+.date-nav-btn{width:34px;height:34px;border-radius:9px;border:1.5px solid var(--gray200);background:white;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:var(--trans);}
+.date-nav-btn:hover{border-color:var(--sky);color:var(--sky-d);background:var(--sky-xl);}
+.date-display{font-family:var(--display);font-size:14px;font-weight:800;color:var(--gray700);min-width:160px;text-align:center;}
+
+/* ===== EMPLOYEE DETAIL MINI ===== */
+.emp-detail-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--gray100);}
+.emp-detail-row:last-child{border-bottom:none;}
+
+/* ===== RIWAYAT PER KARYAWAN ===== */
+.emp-att-card{
+  background:white;border-radius:var(--radius);border:1px solid var(--gray100);
+  overflow:hidden;margin-bottom:14px;transition:var(--trans);
+  animation:empIn 0.35s ease both;
+}
+.emp-att-card:hover{box-shadow:var(--shadow-md);}
+.emp-att-header{
+  background:linear-gradient(135deg,var(--sky-xl),var(--gray50));
+  padding:14px 18px;border-bottom:1px solid var(--gray100);
+  display:flex;align-items:center;justify-content:space-between;
+}
+
+/* ===== SUMMARY STRIP ===== */
+.summary-strip{
+  display:flex;gap:8px;padding:12px 16px;
+  background:var(--gray50);border-radius:10px;margin-bottom:14px;flex-wrap:wrap;
+}
+.summary-item{flex:1;min-width:80px;text-align:center;padding:8px 6px;background:white;border-radius:8px;border:1px solid var(--gray100);}
+.summary-val{font-family:var(--mono);font-size:16px;font-weight:800;color:var(--gray700);}
+.summary-lbl{font-size:10px;color:var(--gray400);font-weight:600;margin-top:2px;text-transform:uppercase;letter-spacing:0.4px;}
+
+/* ===== QUICK STATS ===== */
+.quick-stat{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:var(--gray50);margin-bottom:8px;}
+.quick-stat:last-child{margin-bottom:0;}
+.quick-stat-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.quick-stat-info{flex:1;}
+.quick-stat-val{font-family:var(--mono);font-size:14px;font-weight:800;color:var(--gray700);}
+.quick-stat-lbl{font-size:10px;color:var(--gray400);font-weight:600;}
+
+/* ===== HISTORY SLIP PRINT MONTH BUTTON ===== */
+.slip-month-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 16px;border-radius:9px;border:1.5px solid var(--sky-l);
+  background:white;color:var(--sky-d);
+  font-size:12px;font-weight:700;cursor:pointer;transition:var(--trans);
+  font-family:var(--font);
+}
+.slip-month-btn:hover{background:var(--sky-xl);transform:translateY(-1px);}
+
+/* ===== EXPORT PANEL ===== */
+.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.export-btn{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:16px;border-radius:12px;border:1.5px solid var(--gray200);
+  background:white;cursor:pointer;transition:var(--trans);
+  font-family:var(--font);font-size:12px;font-weight:700;color:var(--gray600);
+}
+.export-btn:hover{border-color:var(--sky-l);color:var(--sky-d);background:var(--sky-xl);transform:translateY(-2px);}
+.export-btn-icon{font-size:24px;}
+
+/* ===== PRINT STYLES ===== */
+@media print{
+  .sidebar,.topbar,.fab,.toast,.modal-overlay,.btn,.nav-list,.sidebar-user,
+  .export-grid,.slip-month-btn,#toast,.topbar-right{display:none!important;}
+  .slip-print{border:1px solid #ddd;page-break-after:always;}
+  body{overflow:auto;}
+  #app{height:auto;overflow:auto;}
+  .main{overflow:auto;}
+  .content-area{overflow:auto;height:auto;}
+}
+
+/* ===== LOADING SKELETON ===== */
+.skeleton{background:linear-gradient(90deg,var(--gray100) 25%,var(--gray50) 50%,var(--gray100) 75%);background-size:200%;animation:skeleton 1.4s ease infinite;}
+@keyframes skeleton{0%{background-position:200%}100%{background-position:-200%}}
+
+/* ===== ANIMATED COUNTER ===== */
+.counter-animate{transition:all 0.5s ease;}
+
+/* ===== DASHBOARD HERO ===== */
+.dash-hero{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--sky-d) 100%);
+  border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:20px;
+  color:white;position:relative;overflow:hidden;
+  animation:statIn 0.5s ease both;
+}
+.dash-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.05);}
+.dash-hero::after{content:'';position:absolute;bottom:-40px;left:100px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.04);}
+.dash-hero-title{font-family:var(--display);font-size:22px;font-weight:800;margin-bottom:4px;position:relative;z-index:1;}
+.dash-hero-sub{color:rgba(255,255,255,0.65);font-size:13px;position:relative;z-index:1;}
+.dash-hero-right{position:relative;z-index:1;text-align:right;}
+.dash-hero-total{font-family:var(--mono);font-size:28px;font-weight:800;}
+.dash-hero-lbl{color:rgba(255,255,255,0.55);font-size:11px;margin-top:3px;}
+</style>
+</head>
+<body>
+
+<!-- ====== LOGIN ====== -->
+<div id="login-screen">
+  <div class="login-bg-circles">
+    <div class="lc lc1"></div>
+    <div class="lc lc2"></div>
+    <div class="lc lc3"></div>
+    <div class="lc lc4"></div>
+  </div>
+  <div id="login-particles"></div>
+  <div class="login-card">
+    <div class="login-logo">ℛ</div>
+    <div class="login-title">Rarestore</div>
+    <div class="login-badge"><span></span>Sistem Manajemen</div>
+    <div class="login-field">
+      <label class="login-label">ID Pengguna</label>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">👤</span>
+        <input class="login-input" id="login-id" type="text" placeholder="Masukkan ID Anda" autocomplete="username">
+      </div>
+    </div>
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <div class="login-input-wrap">
+        <span class="login-input-icon">🔑</span>
+        <input class="login-input" id="login-pw" type="password" placeholder="Masukkan password" autocomplete="current-password">
+      </div>
+    </div>
+    <button class="login-btn" onclick="doLogin()">
+      <span class="login-btn-shine"></span>
+      Login
+    </button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ====== MAIN APP ====== -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-icon">ℛ</div>
+      <div class="sidebar-brand">Rarestore<span>v3.0 — 2026</span></div>
+    </div>
+    <nav class="nav-list">
+      <div class="nav-section-label">Utama</div>
+      <div class="nav-item active" onclick="showPage('dashboard',this)">
+        <span class="nav-icon"></span> Dashboard
+      </div>
+      <div class="nav-item" onclick="showPage('karyawan',this)">
+        <span class="nav-icon"></span> Karyawan
+      </div>
+      <div class="nav-section-label">Operasional</div>
+      <div class="nav-item" onclick="showPage('absensi',this)">
+        <span class="nav-icon"></span> Absensi Harian
+      </div>
+      <div class="nav-item" onclick="showPage('riwayat-absen',this)">
+        <span class="nav-icon"></span> Riwayat Absensi
+      </div>
+      <div class="nav-section-label">Keuangan</div>
+      <div class="nav-item" onclick="showPage('penggajian',this)">
+        <span class="nav-icon"></span> Penggajian
+      </div>
+      <div class="nav-item" onclick="showPage('riwayat',this)">
+        <span class="nav-icon"></span> Riwayat Gaji
+      </div>
+      <div class="nav-section-label">Lainnya</div>
+      <div class="nav-item" onclick="showPage('laporan',this)">
+        <span class="nav-icon">📈</span> Laporan & Grafik
+      </div>
+      <div class="nav-item" onclick="showPage('pengaturan',this)">
+        <span class="nav-icon">⚙️</span> Pengaturan
+      </div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-avatar">AF</div>
+      <div class="user-info">
+        <div class="user-name">Aidil Farhan</div>
+        <div class="user-role">Administrator</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()" title="Logout">⏻</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-meta" id="topbar-meta">Selamat datang kembali, Aidil Farhan</div>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-date" id="topbar-date"></span>
+        <button class="topbar-btn" onclick="showPage('absensi')" title="Input Absensi">📋</button>
+        <button class="topbar-btn" onclick="showPage('penggajian')" title="Penggajian">💰</button>
+        <span style="font-size:12px;color:var(--gray500);display:flex;align-items:center;"><span class="pulse"></span>Sistem Aktif</span>
+      </div>
+    </div>
+
+    <div class="content-area" id="content-area">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="dash-hero">
+          <div class="flex between center">
+            <div>
+              <div class="dash-hero-title" id="dash-hero-title">Selamat datang, Aidil! </div>
+              <div class="dash-hero-sub" id="dash-hero-sub">Ringkasan penggajian bulan ini</div>
+            </div>
+            <div class="dash-hero-right">
+              <div class="dash-hero-total" id="dash-hero-total">—</div>
+              <div class="dash-hero-lbl">Estimasi Total Gaji Bersih</div>
+            </div>
+          </div>
+        </div>
+        <div class="stats-grid" id="dash-stats"></div>
+        <div class="grid2 mb20">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📊 Gaji Pokok vs Bersih</div>
+              <select class="input" style="width:auto;padding:5px 10px;font-size:11px;" id="chart-month-filter" onchange="renderCharts()">
+                <option value="current">Bulan Ini</option>
+              </select>
+            </div>
+            <div class="card-body">
+              <div class="chart-container"><canvas id="chart-salary"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🍩 Distribusi Gaji Bersih</div>
+            </div>
+            <div class="card-body">
+              <div class="chart-container"><canvas id="chart-dist"></canvas></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📋 Rekap Absensi Bulan Ini</div>
+            </div>
+            <div class="card-body">
+              <div class="chart-mini"><canvas id="chart-att"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">👥 Status Karyawan Hari Ini</div>
+              <span class="chip chip-blue" id="dash-today-label">—</span>
+            </div>
+            <div class="card-body" id="dash-emp-status"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KARYAWAN -->
+      <div class="page" id="page-karyawan">
+        <div class="flex between center mb20">
+          <div class="section-title" style="margin-bottom:0"><div class="dot"></div>Daftar Karyawan</div>
+          <div class="flex gap8">
+            <button class="btn btn-outline btn-sm" onclick="showPage('riwayat-absen')">📅 Riwayat Absen</button>
+            <button class="btn btn-primary btn-sm" onclick="openAddEmp()">＋ Tambah Karyawan</button>
+          </div>
+        </div>
+        <div class="grid-auto" id="emp-grid"></div>
+      </div>
+
+      <!-- ABSENSI -->
+      <div class="page" id="page-absensi">
+        <div class="flex between center mb20">
+          <div>
+            <div class="section-title" style="margin-bottom:0"><div class="dot"></div>Catat Kehadiran</div>
+            <div class="text-sm text-muted mt8">Input absensi harian karyawan</div>
+          </div>
+          <div class="flex gap8 center">
+            <div class="date-nav">
+              <button class="date-nav-btn" onclick="changeAttDate(-1)">‹</button>
+              <div class="date-display" id="att-date-display"></div>
+              <button class="date-nav-btn" onclick="changeAttDate(1)" id="btn-next-date">›</button>
+            </div>
+            <button class="btn btn-success" onclick="saveAttendance()">💾 Simpan</button>
+          </div>
+        </div>
+        <div class="card mb16">
+          <div class="card-body" style="padding:0;overflow-x:auto;">
+            <table class="att-table" id="att-table"></table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">📊 Rekap Bulan Ini</div></div>
+          <div class="card-body" id="att-summary"></div>
+        </div>
+      </div>
+
+      <!-- RIWAYAT ABSENSI -->
+      <div class="page" id="page-riwayat-absen">
+        <div class="flex between center mb20">
+          <div class="section-title" style="margin-bottom:0"><div class="dot"></div>Riwayat Absensi</div>
+          <div class="flex gap8 center">
+            <select class="input" style="width:auto;padding:8px 12px;" id="ratt-emp-sel" onchange="renderRiwayatAbsen()">
+              <option value="all">Semua Karyawan</option>
+            </select>
+            <select class="input" style="width:auto;padding:8px 12px;" id="ratt-month-sel" onchange="renderRiwayatAbsen()"></select>
+            <button class="btn btn-outline btn-sm" onclick="exportAttPDF()">📄 Export</button>
+          </div>
+        </div>
+        <div id="ratt-content"></div>
+      </div>
+
+      <!-- PENGGAJIAN -->
+      <div class="page" id="page-penggajian">
+        <div class="flex between center mb20">
+          <div>
+            <div class="section-title" style="margin-bottom:0"><div class="dot"></div>Proses Penggajian</div>
+            <div class="text-sm text-muted mt8" id="payroll-month-label"></div>
+          </div>
+          <button class="btn btn-success" onclick="processPayroll()">✅ Proses & Simpan Gaji</button>
+        </div>
+        <div id="payroll-list"></div>
+      </div>
+
+      <!-- RIWAYAT GAJI -->
+      <div class="page" id="page-riwayat">
+        <div class="flex between center mb20">
+          <div class="section-title" style="margin-bottom:0"><div class="dot"></div>Riwayat Penggajian</div>
+          <div class="flex gap8">
+            <select class="input" style="width:auto;padding:8px 12px;" id="hist-filter" onchange="renderRiwayat()">
+              <option value="all">Semua Periode</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="exportAllSlipPDF()">🖨️ Cetak Semua</button>
+          </div>
+        </div>
+        <div id="history-list"></div>
+      </div>
+
+      <!-- LAPORAN & GRAFIK -->
+      <div class="page" id="page-laporan">
+        <div class="section-title mb20"><div class="dot"></div>Laporan & Analitik</div>
+        <div class="grid2 mb16">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📈 Tren Penggajian Bulanan</div>
+            </div>
+            <div class="card-body">
+              <div class="chart-lg"><canvas id="chart-trend"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🎯 Potongan per Karyawan</div>
+            </div>
+            <div class="card-body">
+              <div class="chart-lg"><canvas id="chart-deduct"></canvas></div>
+            </div>
+          </div>
+        </div>
+        <div class="card mb16">
+          <div class="card-header">
+            <div class="card-title">📊 Grafik Kehadiran Semua Karyawan</div>
+            <select class="input" style="width:auto;padding:5px 10px;font-size:11px;" id="att-chart-month" onchange="renderAttChart()"></select>
+          </div>
+          <div class="card-body">
+            <div class="chart-lg"><canvas id="chart-att-detail"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">📤 Export Data</div></div>
+          <div class="card-body">
+            <div class="export-grid">
+              <button class="export-btn" onclick="exportCSV()">
+                <span class="export-btn-icon">📊</span>
+                Export CSV Karyawan
+              </button>
+              <button class="export-btn" onclick="exportAttCSV()">
+                <span class="export-btn-icon">📋</span>
+                Export CSV Absensi
+              </button>
+              <button class="export-btn" onclick="exportAllSlipPDF()">
+                <span class="export-btn-icon">🖨️</span>
+                Print Semua Slip
+              </button>
+              <button class="export-btn" onclick="exportPayrollCSV()">
+                <span class="export-btn-icon">💰</span>
+                Export CSV Penggajian
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PENGATURAN -->
+      <div class="page" id="page-pengaturan">
+        <div class="section-title mb20"><div class="dot"></div>Pengaturan Sistem</div>
+        <div class="grid2 mb16">
+          <div class="card">
+            <div class="card-header"><div class="card-title">⚙️ Edit Data Karyawan</div></div>
+            <div class="card-body" id="settings-list"></div>
+            <div style="padding:0 20px 20px;"><button class="btn btn-primary btn-full" onclick="saveSettings()">💾 Simpan Perubahan</button></div>
+          </div>
+          <div>
+            <div class="card mb16">
+              <div class="card-header"><div class="card-title">📏 Aturan Potongan</div></div>
+              <div class="card-body">
+                <div class="flex between center mb12">
+                  <div><div class="fw700 text-sm">Alpa (Tidak Hadir)</div><div class="text-xs text-muted">Per hari tanpa keterangan</div></div>
+                  <span class="chip chip-a">3% / hari</span>
+                </div>
+                <div class="flex between center mb12">
+                  <div><div class="fw700 text-sm">Sakit</div><div class="text-xs text-muted">Per hari sakit berketerangan</div></div>
+                  <span class="chip chip-s">1% / hari</span>
+                </div>
+                <div class="flex between center">
+                  <div><div class="fw700 text-sm">Hadir</div><div class="text-xs text-muted">Tidak ada potongan</div></div>
+                  <span class="chip chip-h">0% / hari</span>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">ℹ️ Info Akun</div></div>
+              <div class="card-body">
+                <div class="quick-stat">
+                  <div class="quick-stat-icon" style="background:var(--sky-xl)">👤</div>
+                  <div class="quick-stat-info">
+                    <div class="quick-stat-val">aidilfarhan</div>
+                    <div class="quick-stat-lbl">ID Pengguna</div>
+                  </div>
+                </div>
+                <div class="quick-stat mt8">
+                  <div class="quick-stat-icon" style="background:var(--green-l)">🛡️</div>
+                  <div class="quick-stat-info">
+                    <div class="quick-stat-val">Administrator</div>
+                    <div class="quick-stat-lbl">Level Akses</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mt16">
+              <div class="card-header"><div class="card-title">⚠️ Zona Berbahaya</div></div>
+              <div class="card-body">
+                <button class="btn btn-danger btn-full mb8" onclick="resetData()">🗑️ Reset Semua Data</button>
+                <div class="text-xs text-muted" style="text-align:center;">Data absensi & riwayat gaji akan dihapus permanen</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL EDIT KARYAWAN ====== -->
+<div class="modal-overlay" id="modal-emp">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-emp-title">Edit Karyawan</div>
+      <button class="modal-close" onclick="closeModal('modal-emp')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="emp-edit-id">
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap</label>
+        <input class="input" id="emp-edit-name" placeholder="Nama karyawan">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Jabatan</label>
+        <input class="input" id="emp-edit-role" placeholder="Jabatan/posisi">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gaji Pokok (Rp)</label>
+        <input class="input input-mono" id="emp-edit-salary" type="number" placeholder="5000000">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Warna Avatar</label>
+        <div class="flex gap8" id="color-picker"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-emp')">Batal</button>
+      <button class="btn btn-primary" onclick="saveEmpModal()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL SLIP GAJI ====== -->
+<div class="modal-overlay" id="modal-slip">
+  <div class="modal" style="width:580px;">
+    <div class="modal-header">
+      <div class="modal-title">🧾 Slip Gaji</div>
+      <button class="modal-close" onclick="closeModal('modal-slip')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="slip-content"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-slip')">Tutup</button>
+      <button class="btn btn-outline" onclick="printSlip()">🖨️ Cetak</button>
+      <button class="btn btn-primary" onclick="downloadSlipPDF()">📄 Download PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL RIWAYAT ABSENSI PER KARYAWAN ====== -->
+<div class="modal-overlay" id="modal-att-detail">
+  <div class="modal" style="width:580px;">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-att-title">Riwayat Absensi</div>
+      <button class="modal-close" onclick="closeModal('modal-att-detail')">✕</button>
+    </div>
+    <div class="modal-body" id="modal-att-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATABASE =====
+const KEY = 'payrollpro_v3';
+const COLORS = [
+  {bg:'#dbeafe',fg:'#1d4ed8'},{bg:'#dcfce7',fg:'#15803d'},
+  {bg:'#fce7f3',fg:'#be185d'},{bg:'#fef3c7',fg:'#b45309'},
+  {bg:'#ede9fe',fg:'#6d28d9'},{bg:'#fee2e2',fg:'#b91c1c'},
+  {bg:'#f0fdf4',fg:'#166534'},{bg:'#fff7ed',fg:'#c2410c'},
+  {bg:'#e0f2fe',fg:'#0369a1'},{bg:'#fdf4ff',fg:'#7e22ce'}
+];
+const DEFAULTS = [
+  {id:1,name:'Budi Santoso',role:'Manajer',salary:5000000,colorIdx:0},
+  {id:2,name:'Sari Dewi',role:'Asst. Manajer',salary:4500000,colorIdx:4},
+  {id:3,name:'Andi Pratama',role:'Karyawan',salary:2500000,colorIdx:1},
+  {id:4,name:'Rina Agustina',role:'Karyawan',salary:2500000,colorIdx:3},
+  {id:5,name:'Dedi Firmansyah',role:'Karyawan',salary:2500000,colorIdx:5}
+];
+
+function load(){
+  try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch(e){}
+  return{employees:JSON.parse(JSON.stringify(DEFAULTS)),attendance:{},payrollHistory:[]};
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));}
+let db=load();
+
+// ===== HELPERS =====
+function fmt(n){return'Rp '+Math.round(n).toLocaleString('id-ID');}
+function initials(n){return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+function todayKey(){return new Date().toISOString().split('T')[0];}
+function monthKey(d=new Date()){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+function monthName(mk){const[y,m]=mk.split('-');return new Date(y,m-1).toLocaleString('id-ID',{month:'long',year:'numeric'});}
+function nowMonthName(){return new Date().toLocaleString('id-ID',{month:'long',year:'numeric'});}
+function daysInMonth(mk){const[y,m]=mk.split('-');return new Date(y,m,0).getDate();}
+function daysPassed(){return new Date().getDate();}
+function daysLeft(){const d=new Date();return daysInMonth(monthKey())-d.getDate();}
+function getColor(emp){return COLORS[emp.colorIdx%COLORS.length]||COLORS[0];}
+function dateKeyFull(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+
+function getMonthAtt(empId,mk=null){
+  const m=mk||monthKey();
+  let h=0,s=0,a=0;
+  for(const[k,v]of Object.entries(db.attendance)){
+    if(!k.startsWith(m))continue;
+    const st=v[empId];
+    if(st==='hadir')h++;else if(st==='sakit')s++;else if(st==='alpa')a++;
+  }
+  return{hadir:h,sakit:s,alpa:a};
+}
+
+function calcNet(emp,mk=null){
+  const{sakit,alpa,hadir}=getMonthAtt(emp.id,mk);
+  const cutAlpa=emp.salary*0.03*alpa;
+  const cutSakit=emp.salary*0.01*sakit;
+  const net=Math.max(0,emp.salary-cutAlpa-cutSakit);
+  return{base:emp.salary,cutAlpa,cutSakit,alpa,sakit,hadir,net};
+}
+
+// ===== PARTICLES (LOGIN) =====
+function initParticles(){
+  const container=document.getElementById('login-particles');
+  const colors=['rgba(14,165,233,0.5)','rgba(255,255,255,0.3)','rgba(139,92,246,0.4)','rgba(34,197,94,0.3)'];
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const size=Math.random()*10+4;
+    const color=colors[Math.floor(Math.random()*colors.length)];
+    const left=Math.random()*100;
+    const duration=Math.random()*8+6;
+    const delay=Math.random()*8;
+    p.style.cssText=`width:${size}px;height:${size}px;background:${color};left:${left}%;animation-duration:${duration}s;animation-delay:${delay}s;`;
+    container.appendChild(p);
+  }
+}
+initParticles();
+
+// ===== NAV RIPPLE =====
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',function(e){
+    const r=document.createElement('div');
+    r.className='nav-ripple';
+    const rect=this.getBoundingClientRect();
+    r.style.left=(e.clientX-rect.left)+'px';
+    r.style.top=(e.clientY-rect.top)+'px';
+    this.appendChild(r);
+    setTimeout(()=>r.remove(),500);
+  });
+});
+
+// ===== LOGIN =====
+function doLogin(){
+  const id=document.getElementById('login-id').value.trim();
+  const pw=document.getElementById('login-pw').value.trim();
+  const errEl=document.getElementById('login-err');
+  if(id==='aidilfarhan'&&pw==='22122001'){
+    errEl.textContent='';
+    const ls=document.getElementById('login-screen');
+    ls.classList.add('hiding');
+    setTimeout(()=>{ls.style.display='none';document.getElementById('app').classList.add('visible');initApp();},700);
+  }else{
+    errEl.textContent='⚠️ ID atau password salah!';
+    ['login-id','login-pw'].forEach(el=>{
+      const e=document.getElementById(el);
+      e.classList.add('error');setTimeout(()=>e.classList.remove('error'),500);
+    });
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const ls=document.getElementById('login-screen');
+    if(ls&&ls.style.display!=='none'&&!ls.classList.contains('hiding'))doLogin();
+  }
+});
+
+function doLogout(){
+  document.getElementById('app').classList.remove('visible');
+  const ls=document.getElementById('login-screen');
+  ls.style.display='flex';ls.classList.remove('hiding');
+  setTimeout(()=>{ls.style.opacity='';ls.style.transform='';},50);
+  document.getElementById('login-id').value='';
+  document.getElementById('login-pw').value='';
+  showToast(' Berhasil logout','info');
+}
+
+// ===== INIT =====
+let charts={};
+let currentAttDate=new Date();
+
+function initApp(){
+  updateTopbarDate();
+  // reset to today when opening absensi
+  currentAttDate=new Date();
+  showPage('dashboard');
+}
+
+function updateTopbarDate(){
+  document.getElementById('topbar-date').textContent=
+    new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+}
+
+const PAGE_TITLES={
+  dashboard:'Dashboard',karyawan:'Data Karyawan',
+  absensi:'Absensi Harian',penggajian:'Penggajian',
+  riwayat:'Riwayat Gaji','riwayat-absen':'Riwayat Absensi',
+  laporan:'Laporan & Analitik',pengaturan:'Pengaturan'
+};
+
+const PAGE_META={
+  dashboard:'Ringkasan penggajian dan kehadiran',
+  karyawan:'Kelola data karyawan',
+  absensi:'Input kehadiran harian',
+  penggajian:'Kalkulasi dan proses gaji',
+  riwayat:'Riwayat slip gaji per periode',
+  'riwayat-absen':'Riwayat kehadiran per karyawan',
+  laporan:'Grafik dan analitik data',
+  pengaturan:'Konfigurasi sistem'
+};
+
+function showPage(name,el){
+  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');});
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pg=document.getElementById('page-'+name);
+  if(pg)pg.classList.add('active');
+  if(el)el.classList.add('active');
+  else{
+    document.querySelectorAll('.nav-item').forEach(n=>{
+      if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes(`'${name}'`))n.classList.add('active');
+    });
+  }
+  document.getElementById('topbar-title').textContent=PAGE_TITLES[name]||name;
+  document.getElementById('topbar-meta').textContent=PAGE_META[name]||'';
+  if(name==='dashboard')renderDashboard();
+  if(name==='karyawan')renderKaryawan();
+  if(name==='absensi')renderAbsensi();
+  if(name==='riwayat-absen')renderRiwayatAbsen();
+  if(name==='penggajian')renderPenggajian();
+  if(name==='riwayat')renderRiwayat();
+  if(name==='laporan')renderLaporan();
+  if(name==='pengaturan')renderPengaturan();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(){
+  const totalPokok=db.employees.reduce((s,e)=>s+e.salary,0);
+  const totalNet=db.employees.reduce((s,e)=>s+calcNet(e).net,0);
+  const totalPot=totalPokok-totalNet;
+  const pct=Math.round((daysPassed()/daysInMonth(monthKey()))*100);
+  const todayStr=todayKey();
+
+  // Hero
+  document.getElementById('dash-hero-title').textContent=`Selamat datang, Aidil! `;
+  document.getElementById('dash-hero-sub').textContent=`${nowMonthName()} · ${daysPassed()} dari ${daysInMonth(monthKey())} hari kerja`;
+  document.getElementById('dash-hero-total').textContent=fmt(totalNet);
+  document.getElementById('dash-today-label').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'short'});
+
+  // Stat cards
+  const hadirToday=db.employees.filter(e=>(db.attendance[`${monthKey()}-${todayStr}`]||{})[e.id]==='hadir').length;
+  document.getElementById('dash-stats').innerHTML=`
+    <div class="stat-card">
+      <div class="stat-accent" style="background:linear-gradient(90deg,#38bdf8,#0369a1)"></div>
+      <div class="stat-bg" style="background:linear-gradient(135deg,#38bdf8,#0369a1)"></div>
+      <div class="stat-icon-wrap" style="background:var(--sky-xl)">👥</div>
+      <div class="stat-label">Total Karyawan</div>
+      <div class="stat-value">${db.employees.length}</div>
+      <div class="stat-trend trend-up">↑ ${hadirToday} hadir hari ini</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-accent" style="background:linear-gradient(90deg,#22c55e,#15803d)"></div>
+      <div class="stat-bg" style="background:linear-gradient(135deg,#22c55e,#15803d)"></div>
+      <div class="stat-icon-wrap" style="background:var(--green-l)">💰</div>
+      <div class="stat-label">Estimasi Gaji Bersih</div>
+      <div class="stat-value" style="font-size:15px">${fmt(totalNet)}</div>
+      <div class="stat-sub">${nowMonthName()}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-accent" style="background:linear-gradient(90deg,#f59e0b,#b45309)"></div>
+      <div class="stat-bg" style="background:linear-gradient(135deg,#f59e0b,#b45309)"></div>
+      <div class="stat-icon-wrap" style="background:var(--amber-l)">✂️</div>
+      <div class="stat-label">Total Potongan</div>
+      <div class="stat-value" style="font-size:15px">${fmt(totalPot)}</div>
+      <div class="stat-trend trend-dn">${totalPot>0?'Alpa + Sakit':'Tidak ada potongan'}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-accent" style="background:linear-gradient(90deg,#8b5cf6,#6d28d9)"></div>
+      <div class="stat-bg" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)"></div>
+      <div class="stat-icon-wrap" style="background:var(--purple-l)">📅</div>
+      <div class="stat-label">Progres Bulan</div>
+      <div class="stat-value">${pct}%</div>
+      <div class="progress mt8"><div class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,#8b5cf6,#6d28d9)"></div></div>
+      <div class="stat-sub">${daysPassed()} / ${daysInMonth(monthKey())} hari</div>
+    </div>
+  `;
+  setTimeout(()=>{renderCharts();renderDashEmpStatus();},100);
+}
+
+function renderCharts(){
+  const mk=monthKey();
+  // Salary bar chart
+  if(charts.salary)charts.salary.destroy();
+  const ctx1=document.getElementById('chart-salary');
+  if(!ctx1)return;
+  charts.salary=new Chart(ctx1,{
+    type:'bar',
+    data:{
+      labels:db.employees.map(e=>e.name.split(' ')[0]),
+      datasets:[
+        {label:'Gaji Pokok',data:db.employees.map(e=>e.salary),
+          backgroundColor:'rgba(14,165,233,0.12)',borderColor:'rgba(14,165,233,0.8)',
+          borderWidth:2,borderRadius:8,borderSkipped:false},
+        {label:'Gaji Bersih',data:db.employees.map(e=>calcNet(e).net),
+          backgroundColor:'rgba(34,197,94,0.12)',borderColor:'rgba(34,197,94,0.8)',
+          borderWidth:2,borderRadius:8,borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:800,easing:'easeOutQuart'},
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:11},boxWidth:14,padding:16}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmt(ctx.raw)}`},
+          backgroundColor:'rgba(15,23,42,0.9)',padding:10,cornerRadius:10,bodyFont:{size:12}}
+      },
+      scales:{
+        y:{ticks:{callback:v=>'Rp'+(v/1000000).toFixed(1)+'jt',font:{size:10}},
+          grid:{color:'rgba(0,0,0,0.04)'},border:{display:false}},
+        x:{grid:{display:false},ticks:{font:{size:11}}}
+      }
+    }
+  });
+
+  // Doughnut distribution
+  if(charts.dist)charts.dist.destroy();
+  const ctx2=document.getElementById('chart-dist');
+  if(!ctx2)return;
+  charts.dist=new Chart(ctx2,{
+    type:'doughnut',
+    data:{
+      labels:db.employees.map(e=>e.name.split(' ')[0]),
+      datasets:[{
+        data:db.employees.map(e=>calcNet(e).net),
+        backgroundColor:['rgba(14,165,233,0.75)','rgba(139,92,246,0.75)','rgba(34,197,94,0.75)','rgba(245,158,11,0.75)','rgba(239,68,68,0.75)','rgba(20,184,166,0.75)'],
+        borderWidth:3,borderColor:'white',hoverOffset:10
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'70%',
+      animation:{animateRotate:true,duration:900,easing:'easeOutQuart'},
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:11},boxWidth:14,padding:14}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${fmt(ctx.raw)}`},
+          backgroundColor:'rgba(15,23,42,0.9)',padding:10,cornerRadius:10}
+      }
+    }
+  });
+
+  // Attendance stacked bar
+  if(charts.att)charts.att.destroy();
+  const ctx3=document.getElementById('chart-att');
+  if(!ctx3)return;
+  charts.att=new Chart(ctx3,{
+    type:'bar',
+    data:{
+      labels:db.employees.map(e=>e.name.split(' ')[0]),
+      datasets:[
+        {label:'Hadir',data:db.employees.map(e=>getMonthAtt(e.id).hadir),backgroundColor:'rgba(34,197,94,0.75)',borderRadius:4,borderSkipped:false},
+        {label:'Sakit',data:db.employees.map(e=>getMonthAtt(e.id).sakit),backgroundColor:'rgba(245,158,11,0.75)',borderRadius:4,borderSkipped:false},
+        {label:'Alpa',data:db.employees.map(e=>getMonthAtt(e.id).alpa),backgroundColor:'rgba(239,68,68,0.75)',borderRadius:4,borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:800},
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:12}},
+        tooltip:{backgroundColor:'rgba(15,23,42,0.9)',padding:10,cornerRadius:10}},
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}},
+        y:{stacked:true,ticks:{stepSize:1,font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'},border:{display:false}}
+      }
+    }
+  });
+}
+
+function renderDashEmpStatus(){
+  const el=document.getElementById('dash-emp-status');
+  const today=todayKey();
+  const todayData=db.attendance[`${monthKey()}-${today}`]||{};
+  let html='';
+  for(const emp of db.employees){
+    const c=getColor(emp);
+    const st=todayData[emp.id]||null;
+    const{net}=calcNet(emp);
+    html+=`<div class="flex between center mb12" style="animation:rowIn 0.3s ease both;animation-delay:${db.employees.indexOf(emp)*0.07}s">
+      <div class="flex center gap12">
+        <div style="width:38px;height:38px;border-radius:11px;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">${initials(emp.name)}</div>
+        <div><div class="fw700 text-sm">${emp.name}</div><div class="text-xs text-muted">${emp.role}</div></div>
+      </div>
+      <div class="flex center gap8">
+        <span class="chip ${st==='hadir'?'chip-h':st==='sakit'?'chip-s':st==='alpa'?'chip-a':'chip-blue'}">${st?st.charAt(0).toUpperCase()+st.slice(1):'—'}</span>
+        <span class="text-xs" style="font-family:var(--mono);color:var(--green-d);font-weight:700">${fmt(net)}</span>
+      </div>
+    </div>`;
+  }
+  el.innerHTML=html;
+}
+
+// ===== KARYAWAN =====
+function renderKaryawan(){
+  let html='';
+  db.employees.forEach((emp,i)=>{
+    const c=getColor(emp);
+    const{hadir,sakit,alpa}=getMonthAtt(emp.id);
+    const{net}=calcNet(emp);
+    html+=`<div class="emp-card" style="animation-delay:${i*0.08}s" onclick="openEditEmp(${emp.id})">
+      <div class="emp-card-bg" style="background:${c.fg}"></div>
+      <div class="avatar" style="background:${c.bg};color:${c.fg};">${initials(emp.name)}</div>
+      <div class="emp-name">${emp.name}</div>
+      <div class="emp-role">${emp.role}</div>
+      <div class="emp-salary">${fmt(emp.salary)}</div>
+      <div class="emp-chips mt8">
+        <span class="chip chip-h">✓ ${hadir}</span>
+        <span class="chip chip-s">~ ${sakit}</span>
+        <span class="chip chip-a">✗ ${alpa}</span>
+      </div>
+      <div class="flex gap8 mt12" style="justify-content:center">
+        <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openEditEmp(${emp.id})">✏️ Edit</button>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openSlipEmpLatest(${emp.id})">🧾 Slip</button>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEmpAttHistory(${emp.id})">📅 Absen</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('emp-grid').innerHTML=html||'<div class="empty"><div class="empty-icon">👥</div>Belum ada karyawan</div>';
+}
+
+function openAddEmp(){
+  document.getElementById('modal-emp-title').textContent='Tambah Karyawan';
+  document.getElementById('emp-edit-id').value='';
+  document.getElementById('emp-edit-name').value='';
+  document.getElementById('emp-edit-role').value='Karyawan';
+  document.getElementById('emp-edit-salary').value='2500000';
+  renderColorPicker(0);
+  openModal('modal-emp');
+}
+
+function openEditEmp(id){
+  const emp=db.employees.find(e=>e.id===id);
+  if(!emp)return;
+  document.getElementById('modal-emp-title').textContent='Edit Karyawan — '+emp.name;
+  document.getElementById('emp-edit-id').value=id;
+  document.getElementById('emp-edit-name').value=emp.name;
+  document.getElementById('emp-edit-role').value=emp.role;
+  document.getElementById('emp-edit-salary').value=emp.salary;
+  renderColorPicker(emp.colorIdx||0);
+  openModal('modal-emp');
+}
+
+function deleteEmp(){
+  const id=parseInt(document.getElementById('emp-edit-id').value);
+  if(!id){return;}
+  const emp=db.employees.find(e=>e.id===id);
+  if(!emp)return;
+  if(!confirm(`Hapus karyawan ${emp.name}? Data absensi terkait tidak akan terhapus.`))return;
+  db.employees=db.employees.filter(e=>e.id!==id);
+  save();closeModal('modal-emp');renderKaryawan();showToast('🗑️ Karyawan dihapus','info');
+}
+
+let selectedColorIdx=0;
+function renderColorPicker(sel){
+  selectedColorIdx=sel<0?0:sel;
+  const html=COLORS.map((c,i)=>`<div onclick="selColor(${i})" title="Warna ${i+1}" style="width:30px;height:30px;border-radius:9px;background:${c.bg};border:2.5px solid ${i===selectedColorIdx?c.fg:'transparent'};cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;color:${c.fg};font-size:12px;font-weight:800;transform:${i===selectedColorIdx?'scale(1.15)':'scale(1)'}">${i===selectedColorIdx?'✓':''}</div>`).join('');
+  document.getElementById('color-picker').innerHTML=html;
+}
+function selColor(i){selectedColorIdx=i;renderColorPicker(i);}
+
+function saveEmpModal(){
+  const id=parseInt(document.getElementById('emp-edit-id').value);
+  const name=document.getElementById('emp-edit-name').value.trim();
+  const role=document.getElementById('emp-edit-role').value.trim();
+  const salary=parseInt(document.getElementById('emp-edit-salary').value);
+  if(!name||!role||isNaN(salary)||salary<=0){showToast('⚠️ Lengkapi semua field dengan benar!','error');return;}
+  if(id){
+    const emp=db.employees.find(e=>e.id===id);
+    if(emp){emp.name=name;emp.role=role;emp.salary=salary;emp.colorIdx=selectedColorIdx;}
+    showToast('✅ Data karyawan diperbarui!','success');
+  }else{
+    const newId=Math.max(0,...db.employees.map(e=>e.id))+1;
+    db.employees.push({id:newId,name,role,salary,colorIdx:selectedColorIdx});
+    showToast('✅ Karyawan baru ditambahkan!','success');
+  }
+  save();closeModal('modal-emp');renderKaryawan();
+}
+
+// ===== ABSENSI =====
+let todaySel={};
+
+function changeAttDate(dir){
+  currentAttDate=new Date(currentAttDate);
+  currentAttDate.setDate(currentAttDate.getDate()+dir);
+  // can't go to future
+  const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);
+  if(currentAttDate>=tomorrow){currentAttDate=new Date();showToast('⚠️ Tidak bisa input absensi masa depan','error');return;}
+  renderAbsensi();
+}
+
+function renderAbsensi(){
+  const dateKey=dateKeyFull(currentAttDate);
+  const mk=`${currentAttDate.getFullYear()}-${String(currentAttDate.getMonth()+1).padStart(2,'0')}`;
+  const saved=db.attendance[`${mk}-${dateKey}`]||{};
+  todaySel={...saved};
+
+  const isToday=dateKey===todayKey();
+  const dateLabel=currentAttDate.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('att-date-display').textContent=dateLabel;
+  document.getElementById('btn-next-date').disabled=isToday;
+  document.getElementById('btn-next-date').style.opacity=isToday?'0.3':'1';
+
+  let rows=`<thead><tr>
+    <th>Karyawan</th><th>Jabatan</th><th>Kehadiran</th><th>Status</th>
+  </tr></thead><tbody>`;
+  
+  for(const emp of db.employees){
+    const st=todaySel[emp.id]||'hadir';
+    const c=getColor(emp);
+    rows+=`<tr style="animation-delay:${db.employees.indexOf(emp)*0.04}s">
+      <td><div class="flex center gap12">
+        <div style="width:34px;height:34px;border-radius:10px;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">${initials(emp.name)}</div>
+        <span class="fw700">${emp.name}</span></div></td>
+      <td class="text-muted text-sm">${emp.role}</td>
+      <td>
+        <div class="att-btn-group">
+          <button class="att-btn btn-h ${st==='hadir'?'sel':''}" onclick="setAtt(${emp.id},'hadir',this)">✓ Hadir</button>
+          <button class="att-btn btn-s ${st==='sakit'?'sel':''}" onclick="setAtt(${emp.id},'sakit',this)">~ Sakit</button>
+          <button class="att-btn btn-a ${st==='alpa'?'sel':''}" onclick="setAtt(${emp.id},'alpa',this)">✗ Alpa</button>
+        </div>
+      </td>
+      <td><span class="chip ${st==='hadir'?'chip-h':st==='sakit'?'chip-s':'chip-a'}" id="att-status-${emp.id}">${st==='hadir'?'✓ Hadir':st==='sakit'?'~ Sakit':'✗ Alpa'}</span></td>
+    </tr>`;
+  }
+  rows+='</tbody>';
+  document.getElementById('att-table').innerHTML=rows;
+
+  // Summary for current month
+  let sumHtml=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">`;
+  for(const emp of db.employees){
+    const mkCur=monthKey();
+    const{hadir,sakit,alpa}=getMonthAtt(emp.id,mkCur);
+    const c=getColor(emp);
+    sumHtml+=`<div style="background:var(--gray50);border-radius:11px;padding:12px 14px;border:1px solid var(--gray100)">
+      <div class="flex center gap8 mb8">
+        <div style="width:28px;height:28px;border-radius:8px;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px;">${initials(emp.name)}</div>
+        <div class="text-xs fw700">${emp.name.split(' ')[0]}</div>
+      </div>
+      <div class="flex gap6">
+        <span class="chip chip-h">✓ ${hadir}</span>
+        <span class="chip chip-s">~ ${sakit}</span>
+        <span class="chip chip-a">✗ ${alpa}</span>
+      </div>
+    </div>`;
+  }
+  sumHtml+='</div>';
+  document.getElementById('att-summary').innerHTML=sumHtml;
+}
+
+function setAtt(empId,st){
+  todaySel[empId]=st;
+  // Update button states without full re-render
+  const row=document.querySelector(`button[onclick="setAtt(${empId},'hadir',this)"]`)?.closest('tr');
+  if(row){
+    row.querySelectorAll('.att-btn').forEach(b=>b.classList.remove('sel'));
+    row.querySelector(`button[onclick="setAtt(${empId},'${st}',this)"]`)?.classList.add('sel');
+    const chip=document.getElementById('att-status-'+empId);
+    if(chip){
+      chip.className=`chip ${st==='hadir'?'chip-h':st==='sakit'?'chip-s':'chip-a'}`;
+      chip.textContent=st==='hadir'?'✓ Hadir':st==='sakit'?'~ Sakit':'✗ Alpa';
+    }
+  }
+}
+
+function saveAttendance(){
+  const dateKey=dateKeyFull(currentAttDate);
+  const mk=`${currentAttDate.getFullYear()}-${String(currentAttDate.getMonth()+1).padStart(2,'0')}`;
+  // default hadir for all unset
+  for(const emp of db.employees){
+    if(!todaySel[emp.id])todaySel[emp.id]='hadir';
+  }
+  db.attendance[`${mk}-${dateKey}`]={...todaySel};
+  save();
+  showToast(`✅ Kehadiran ${currentAttDate.toLocaleDateString('id-ID',{day:'numeric',month:'short'})} tersimpan!`,'success');
+  renderAbsensi();
+}
+
+// ===== RIWAYAT ABSENSI =====
+function renderRiwayatAbsen(){
+  const empSel=document.getElementById('ratt-emp-sel');
+  const monthSel=document.getElementById('ratt-month-sel');
+  const curEmpVal=empSel.value||'all';
+  empSel.innerHTML='<option value="all">Semua Karyawan</option>'+
+    db.employees.map(e=>`<option value="${e.id}"${curEmpVal==e.id?' selected':''}>${e.name}</option>`).join('');
+
+  const months=[...new Set(Object.keys(db.attendance).map(k=>k.substring(0,7)))].sort().reverse();
+  const curMk=monthKey();
+  if(!months.includes(curMk))months.unshift(curMk);
+  const curMonthVal=monthSel.value||curMk;
+  monthSel.innerHTML=months.map(m=>`<option value="${m}"${m===curMonthVal?' selected':''}>${monthName(m)}</option>`).join('');
+
+  const selEmp=empSel.value;
+  const selMonth=monthSel.value||curMk;
+  const days=daysInMonth(selMonth);
+  const[y,m]=selMonth.split('-');
+  const today=todayKey();
+  const curMkNow=monthKey();
+
+  const empsToShow=selEmp==='all'?db.employees:db.employees.filter(e=>e.id==selEmp);
+  let html='';
+
+  for(const emp of empsToShow){
+    const c=getColor(emp);
+    const dayLabels=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+    let calHTML=dayLabels.map(d=>`<div class="cal-day-label">${d}</div>`).join('');
+    const firstDay=new Date(y,m-1,1).getDay();
+    for(let i=0;i<firstDay;i++)calHTML+=`<div class="cal-day cal-empty"></div>`;
+    for(let d=1;d<=days;d++){
+      const fullDk=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      let st=null;
+      for(const[k,v]of Object.entries(db.attendance)){
+        if(k.startsWith(selMonth)&&k.endsWith(String(d).padStart(2,'0'))){st=v[emp.id]||null;break;}
+      }
+      const isFuture=fullDk>today&&selMonth===curMkNow;
+      const isToday=fullDk===today;
+      const cls=isFuture?'cal-future':st==='hadir'?'cal-h':st==='sakit'?'cal-s':st==='alpa'?'cal-a':'cal-empty';
+      const icon=st==='hadir'?'✓':st==='sakit'?'~':st==='alpa'?'✗':d;
+      calHTML+=`<div class="cal-day ${cls}${isToday?' cal-today':''}" title="${fullDk}: ${st||'Tidak dicatat'}">${icon}</div>`;
+    }
+
+    const{hadir,sakit,alpa}=getMonthAtt(emp.id,selMonth);
+    const{net,base}=calcNet(emp,selMonth);
+    html+=`<div class="emp-att-card" style="animation-delay:${empsToShow.indexOf(emp)*0.06}s">
+      <div class="emp-att-header">
+        <div class="flex center gap12">
+          <div style="width:38px;height:38px;border-radius:11px;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">${initials(emp.name)}</div>
+          <div>
+            <div class="card-title">${emp.name}</div>
+            <div class="text-xs text-muted">${emp.role} · ${monthName(selMonth)}</div>
+          </div>
+        </div>
+        <div class="flex gap8 center">
+          <span class="chip chip-h">✓ ${hadir}</span>
+          <span class="chip chip-s">~ ${sakit}</span>
+          <span class="chip chip-a">✗ ${alpa}</span>
+          <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--green-d)">${fmt(net)}</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="att-calendar">${calHTML}</div>
+        <div class="flex gap12 mt12" style="font-size:11px;align-items:center">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:var(--green-l);border-radius:3px;display:inline-block"></span>Hadir</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:var(--amber-l);border-radius:3px;display:inline-block"></span>Sakit</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:var(--red-l);border-radius:3px;display:inline-block"></span>Alpa</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:var(--gray100);border-radius:3px;display:inline-block"></span>Tidak dicatat</span>
+        </div>
+      </div>
+    </div>`;
+  }
+  document.getElementById('ratt-content').innerHTML=html||`<div class="empty"><div class="empty-icon">📅</div>Belum ada data absensi untuk periode ini</div>`;
+}
+
+function openEmpAttHistory(empId){
+  const emp=db.employees.find(e=>e.id===empId);
+  if(!emp)return;
+  const c=getColor(emp);
+  const mk=monthKey();
+  const{hadir,sakit,alpa}=getMonthAtt(empId,mk);
+  const{net,base}=calcNet(emp,mk);
+  document.getElementById('modal-att-title').textContent=`📅 Riwayat Absensi — ${emp.name}`;
+  
+  // Show summary + this month calendar
+  const days=daysInMonth(mk);
+  const[y,m]=mk.split('-');
+  const today=todayKey();
+  const dayLabels=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  let calHTML=dayLabels.map(d=>`<div class="cal-day-label">${d}</div>`).join('');
+  const firstDay=new Date(y,m-1,1).getDay();
+  for(let i=0;i<firstDay;i++)calHTML+=`<div class="cal-day cal-empty"></div>`;
+  for(let d=1;d<=days;d++){
+    const fullDk=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let st=null;
+    for(const[k,v]of Object.entries(db.attendance)){
+      if(k.startsWith(mk)&&k.endsWith(String(d).padStart(2,'0'))){st=v[empId]||null;break;}
+    }
+    const isFuture=fullDk>today;
+    const isToday=fullDk===today;
+    const cls=isFuture?'cal-future':st==='hadir'?'cal-h':st==='sakit'?'cal-s':st==='alpa'?'cal-a':'cal-empty';
+    const icon=st==='hadir'?'✓':st==='sakit'?'~':st==='alpa'?'✗':d;
+    calHTML+=`<div class="cal-day ${cls}${isToday?' cal-today':''}" title="${fullDk}: ${st||'Tidak dicatat'}">${icon}</div>`;
+  }
+  
+  document.getElementById('modal-att-body').innerHTML=`
+    <div class="summary-strip">
+      <div class="summary-item"><div class="summary-val" style="color:var(--green-d)">${hadir}</div><div class="summary-lbl">Hadir</div></div>
+      <div class="summary-item"><div class="summary-val" style="color:var(--amber-d)">${sakit}</div><div class="summary-lbl">Sakit</div></div>
+      <div class="summary-item"><div class="summary-val" style="color:var(--red-d)">${alpa}</div><div class="summary-lbl">Alpa</div></div>
+      <div class="summary-item"><div class="summary-val" style="color:var(--sky-d);font-size:12px">${fmt(net)}</div><div class="summary-lbl">Gaji Bersih</div></div>
+    </div>
+    <div class="fw700 text-sm mb8" style="color:var(--gray600)">${monthName(mk)}</div>
+    <div class="att-calendar">${calHTML}</div>
+  `;
+  openModal('modal-att-detail');
+}
+
+// ===== PENGGAJIAN =====
+function renderPenggajian(){
+  const mk=monthKey();
+  document.getElementById('payroll-month-label').textContent=`Periode: ${nowMonthName()}`;
+  const alreadyProcessed=db.payrollHistory.find(h=>h.monthKey===mk);
+  
+  let html='';
+  if(alreadyProcessed){
+    html=`<div style="background:var(--green-l);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">✅</span>
+      <div><div class="fw700 text-sm" style="color:var(--green-d)">Gaji bulan ini sudah diproses</div>
+      <div class="text-xs text-muted">Diproses pada: ${new Date(alreadyProcessed.processedAt).toLocaleString('id-ID')}</div></div>
+    </div>`;
+  }
+  
+  db.employees.forEach((emp,i)=>{
+    const c=getColor(emp);
+    const{base,cutAlpa,cutSakit,alpa,sakit,hadir,net}=calcNet(emp);
+    const pct=Math.round((net/base)*100);
+    html+=`<div class="payroll-card" style="animation-delay:${i*0.08}s">
+      <div class="payroll-header">
+        <div style="width:42px;height:42px;border-radius:12px;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;">${initials(emp.name)}</div>
+        <div style="flex:1;margin-left:12px">
+          <div class="fw800">${emp.name}</div>
+          <div class="text-xs text-muted">${emp.role}</div>
+          <div class="flex gap6 mt6">
+            <span class="chip chip-h" style="font-size:9px">✓ ${hadir} hadir</span>
+            <span class="chip chip-s" style="font-size:9px">~ ${sakit} sakit</span>
+            <span class="chip chip-a" style="font-size:9px">✗ ${alpa} alpa</span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <span class="chip chip-blue">${nowMonthName()}</span>
+          <div style="margin-top:8px"><div class="progress" style="width:110px"><div class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,#22c55e,#15803d)"></div></div></div>
+          <div class="text-xs text-muted mt6">${pct}% dari gaji pokok</div>
+        </div>
+      </div>
+      <div class="payroll-body">
+        <div class="payroll-row"><span class="text-sm">Gaji Pokok</span><span class="money">${fmt(base)}</span></div>
+        <div class="payroll-row deduct"><span class="text-sm">Potongan Alpa (${alpa} × 3%)</span><span class="money">- ${fmt(cutAlpa)}</span></div>
+        <div class="payroll-row deduct"><span class="text-sm">Potongan Sakit (${sakit} × 1%)</span><span class="money">- ${fmt(cutSakit)}</span></div>
+        <div class="payroll-row net"><span>💰 Gaji Bersih</span><span class="money">${fmt(net)}</span></div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('payroll-list').innerHTML=html;
+}
+
+function processPayroll(){
+  const mk=monthKey();
+  if(db.payrollHistory.find(h=>h.monthKey===mk)){
+    showToast('⚠️ Gaji bulan ini sudah diproses!','error');return;
+  }
+  const records=db.employees.map(emp=>{
+    const d=calcNet(emp);
+    return{...d,id:emp.id,name:emp.name,role:emp.role};
+  });
+  db.payrollHistory.unshift({
+    monthKey:mk,monthName:nowMonthName(),
+    processedAt:new Date().toISOString(),
+    records,totalNet:records.reduce((s,r)=>s+r.net,0)
+  });
+  save();showToast('✅ Penggajian berhasil diproses!','success');
+  showPage('riwayat');
+}
+
+// ===== RIWAYAT GAJI =====
+function renderRiwayat(){
+  const sel=document.getElementById('hist-filter');
+  const months=[...new Set(db.payrollHistory.map(h=>h.monthKey))];
+  const curVal=sel.value||'all';
+  sel.innerHTML='<option value="all">Semua Periode</option>'+months.map(m=>`<option value="${m}"${m===curVal?' selected':''}>${monthName(m)}</option>`).join('');
+  
+  const filter=sel.value;
+  const hist=filter==='all'?db.payrollHistory:db.payrollHistory.filter(h=>h.monthKey===filter);
+  if(!hist.length){
+    document.getElementById('history-list').innerHTML=`<div class="empty"><div class="empty-icon">📭</div>Belum ada riwayat penggajian<br><span class="text-xs">Proses penggajian terlebih dahulu</span></div>`;
+    return;
+  }
+  
+  let html='';
+  hist.forEach((h,hi)=>{
+    html+=`<div class="hist-item" style="animation-delay:${hi*0.07}s">
+      <div class="flex between center mb16">
+        <div>
+          <div class="fw800" style="font-family:var(--display);color:var(--sky-d);font-size:16px">📅 ${h.monthName}</div>
+          <div class="text-xs text-muted mt4">Diproses: ${new Date(h.processedAt).toLocaleString('id-ID')}</div>
+        </div>
+        <div style="text-align:right;display:flex;align-items:center;gap:10px">
+          <div>
+            <div class="fw800" style="font-family:var(--mono);color:var(--green-d);font-size:18px">${fmt(h.totalNet)}</div>
+            <div class="text-xs text-muted">Total gaji bersih</div>
+          </div>
+          <div class="flex gap6">
+            <button class="slip-month-btn" onclick="showSlipBulk('${h.monthKey}')">🧾 Semua Slip</button>
+            <button class="slip-month-btn" onclick="printMonthPayroll('${h.monthKey}')">🖨️ Cetak</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px">
+        ${h.records.map(r=>{
+          const emp=db.employees.find(e=>e.id===r.id);
+          const c=emp?getColor(emp):COLORS[0];
+          return`<div style="background:var(--gray50);border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.22s;border:1px solid var(--gray100)" 
+            onclick="showSlipModal('${h.monthKey}',${r.id})" 
+            onmouseover="this.style.background='var(--sky-xl)';this.style.borderColor='var(--sky-l)'" 
+            onmouseout="this.style.background='var(--gray50)';this.style.borderColor='var(--gray100)'">
+            <div style="width:32px;height:32px;border-radius:9px;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;flex-shrink:0">${initials(r.name)}</div>
+            <div style="flex:1;min-width:0">
+              <div class="fw700 text-sm" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
+              <div class="text-xs" style="font-family:var(--mono);color:var(--green-d);font-weight:700">${fmt(r.net)}</div>
+            </div>
+            <span style="font-size:18px">🧾</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+  document.getElementById('history-list').innerHTML=html;
+}
+
+// ===== LAPORAN & GRAFIK =====
+function renderLaporan(){
+  // Populate month filter
+  const months=[...new Set(Object.keys(db.attendance).map(k=>k.substring(0,7)))].sort().reverse();
+  const curMk=monthKey();
+  if(!months.includes(curMk))months.unshift(curMk);
+  const attMonthSel=document.getElementById('att-chart-month');
+  if(attMonthSel){
+    attMonthSel.innerHTML=months.map(m=>`<option value="${m}">${monthName(m)}</option>`).join('');
+  }
+  
+  setTimeout(()=>{renderTrendChart();renderDeductChart();renderAttChart();},100);
+}
+
+function renderTrendChart(){
+  if(charts.trend)charts.trend.destroy();
+  const ctx=document.getElementById('chart-trend');
+  if(!ctx)return;
+  
+  const histData=db.payrollHistory.slice().reverse();
+  const labels=histData.map(h=>h.monthName.split(' ')[0]+' '+h.monthName.split(' ')[1]);
+  
+  charts.trend=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:labels.length?labels:['Belum ada data'],
+      datasets:[
+        {label:'Total Gaji Bersih',data:histData.map(h=>h.totalNet),
+          borderColor:'rgba(14,165,233,0.8)',backgroundColor:'rgba(14,165,233,0.08)',
+          borderWidth:2.5,pointRadius:5,pointBackgroundColor:'rgba(14,165,233,1)',
+          fill:true,tension:0.4,pointHoverRadius:8},
+        {label:'Total Gaji Pokok',data:histData.map(h=>h.records.reduce((s,r)=>s+r.base,0)),
+          borderColor:'rgba(139,92,246,0.7)',backgroundColor:'rgba(139,92,246,0.06)',
+          borderWidth:2,pointRadius:4,pointBackgroundColor:'rgba(139,92,246,1)',
+          fill:true,tension:0.4,borderDash:[5,3]}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:1000,easing:'easeOutQuart'},
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:11},boxWidth:14,padding:16}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmt(ctx.raw)}`},
+          backgroundColor:'rgba(15,23,42,0.92)',padding:12,cornerRadius:10}
+      },
+      scales:{
+        y:{ticks:{callback:v=>'Rp'+(v/1000000).toFixed(1)+'jt',font:{size:10}},
+          grid:{color:'rgba(0,0,0,0.04)'},border:{display:false}},
+        x:{grid:{display:false},ticks:{font:{size:10}}}
+      }
+    }
+  });
+}
+
+function renderDeductChart(){
+  if(charts.deduct)charts.deduct.destroy();
+  const ctx=document.getElementById('chart-deduct');
+  if(!ctx)return;
+  
+  charts.deduct=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:db.employees.map(e=>e.name.split(' ')[0]),
+      datasets:[
+        {label:'Potongan Alpa',data:db.employees.map(e=>{const d=calcNet(e);return d.cutAlpa;}),
+          backgroundColor:'rgba(239,68,68,0.12)',borderColor:'rgba(239,68,68,0.75)',borderWidth:2,pointRadius:4},
+        {label:'Potongan Sakit',data:db.employees.map(e=>{const d=calcNet(e);return d.cutSakit;}),
+          backgroundColor:'rgba(245,158,11,0.12)',borderColor:'rgba(245,158,11,0.75)',borderWidth:2,pointRadius:4}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:900},
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:14,padding:14}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmt(ctx.raw)}`},backgroundColor:'rgba(15,23,42,0.92)',padding:10,cornerRadius:10}},
+      scales:{r:{ticks:{callback:v=>'Rp'+(v/1000).toFixed(0)+'rb',font:{size:9}},
+        grid:{color:'rgba(0,0,0,0.06)'},pointLabels:{font:{size:11,weight:'700'}}}}
+    }
+  });
+}
+
+function renderAttChart(){
+  if(charts.attDetail)charts.attDetail.destroy();
+  const ctx=document.getElementById('chart-att-detail');
+  if(!ctx)return;
+  
+  const sel=document.getElementById('att-chart-month');
+  const selMk=sel?sel.value:monthKey();
+  
+  charts.attDetail=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:db.employees.map(e=>e.name),
+      datasets:[
+        {label:'Hadir',data:db.employees.map(e=>getMonthAtt(e.id,selMk).hadir),
+          backgroundColor:'rgba(34,197,94,0.8)',borderRadius:6,borderSkipped:false},
+        {label:'Sakit',data:db.employees.map(e=>getMonthAtt(e.id,selMk).sakit),
+          backgroundColor:'rgba(245,158,11,0.8)',borderRadius:6,borderSkipped:false},
+        {label:'Alpa',data:db.employees.map(e=>getMonthAtt(e.id,selMk).alpa),
+          backgroundColor:'rgba(239,68,68,0.8)',borderRadius:6,borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:800},
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:14,padding:14}},
+        tooltip:{backgroundColor:'rgba(15,23,42,0.92)',padding:10,cornerRadius:10}},
+      scales:{
+        y:{stacked:false,ticks:{stepSize:1,font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'},border:{display:false}},
+        x:{grid:{display:false},ticks:{font:{size:11}}}
+      }
+    }
+  });
+}
+
+// ===== SLIP GAJI =====
+function showSlipModal(mk,empId){
+  const hist=db.payrollHistory.find(h=>h.monthKey===mk);
+  if(!hist)return;
+  const r=hist.records.find(r=>r.id===empId);
+  if(!r)return;
+  const emp=db.employees.find(e=>e.id===empId)||r;
+  document.getElementById('slip-content').innerHTML=buildSlipHTML(r,emp,hist.monthName);
+  openModal('modal-slip');
+}
+
+function openSlipEmpLatest(empId){
+  if(!db.payrollHistory.length){showToast('⚠️ Belum ada riwayat gaji','error');return;}
+  const hist=db.payrollHistory[0];
+  const r=hist.records.find(r=>r.id===empId);
+  if(!r){showToast('⚠️ Karyawan tidak ada dalam riwayat gaji ini','error');return;}
+  const emp=db.employees.find(e=>e.id===empId)||r;
+  document.getElementById('slip-content').innerHTML=buildSlipHTML(r,emp,hist.monthName);
+  openModal('modal-slip');
+}
+
+function showSlipBulk(mk){
+  const hist=db.payrollHistory.find(h=>h.monthKey===mk);
+  if(!hist)return;
+  let allSlips='';
+  for(const r of hist.records){
+    const emp=db.employees.find(e=>e.id===r.id)||r;
+    allSlips+=buildSlipHTML(r,emp,hist.monthName)+`<div style="height:20px"></div>`;
+  }
+  document.getElementById('slip-content').innerHTML=allSlips;
+  openModal('modal-slip');
+}
+
+function buildSlipHTML(r,emp,mName){
+  const{base,cutAlpa,cutSakit,alpa,sakit,net}=r;
+  const c=emp&&emp.colorIdx!=null?getColor(emp):COLORS[0];
+  const hadirDays=r.hadir||0;
+  const now=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  return`<div class="slip-print">
+    <div class="slip-header">
+      <div class="flex between center">
+        <div>
+          <div class="slip-company">🏢 Rarestore</div>
+          <div class="slip-subtitle">Sistem Manajemen</div>
+        </div>
+        <div>
+          <div class="slip-period-badge">📅 ${mName}</div>
+        </div>
+      </div>
+    </div>
+    <div class="slip-body">
+      <div class="slip-emp-section">
+        <div class="slip-field"><label>Nama Karyawan</label><p>${r.name}</p></div>
+        <div class="slip-field"><label>Jabatan</label><p>${r.role}</p></div>
+        <div class="slip-field"><label>Periode Gaji</label><p>${mName}</p></div>
+        <div class="slip-field"><label>Rekap Kehadiran</label><p>${hadirDays} Hadir · ${r.sakit||sakit} Sakit · ${r.alpa||alpa} Alpa</p></div>
+      </div>
+      <table class="slip-table">
+        <thead><tr><th>Komponen</th><th>Keterangan</th><th style="text-align:right">Jumlah</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="fw700">Gaji Pokok</td>
+            <td class="text-muted text-sm">—</td>
+            <td style="text-align:right;font-family:var(--mono);font-weight:700;color:var(--gray700)">${fmt(base)}</td>
+          </tr>
+          <tr>
+            <td style="color:var(--red-d);font-weight:600">Potongan Alpa</td>
+            <td class="text-muted text-sm">${r.alpa||alpa} hari × 3%</td>
+            <td style="text-align:right;font-family:var(--mono);color:var(--red-d)">- ${fmt(cutAlpa)}</td>
+          </tr>
+          <tr>
+            <td style="color:var(--amber-d);font-weight:600">Potongan Sakit</td>
+            <td class="text-muted text-sm">${r.sakit||sakit} hari × 1%</td>
+            <td style="text-align:right;font-family:var(--mono);color:var(--amber-d)">- ${fmt(cutSakit)}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="slip-total">
+        <div>
+          <div class="slip-total-label">TOTAL GAJI BERSIH DITERIMA</div>
+          <div class="text-xs text-muted mt8">Setelah semua potongan · ${mName}</div>
+        </div>
+        <div class="slip-total-value">${fmt(net)}</div>
+      </div>
+    </div>
+    <div class="slip-footer">
+      Slip gaji resmi diterbitkan oleh PayrollPro • ${now} • Aidil Farhan (Administrator)
+    </div>
+  </div>`;
+}
+
+function printSlip(){
+  const content=document.getElementById('slip-content').innerHTML;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8"><title>Slip Gaji — PayrollPro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:#f8fafc;padding:20px;}
+      .slip-print{background:white;border-radius:16px;border:2px solid #bae6fd;overflow:hidden;margin-bottom:20px;max-width:600px;margin:0 auto 20px;}
+      .slip-header{background:linear-gradient(135deg,#0c2d4e,#0369a1);color:white;padding:22px 26px;}
+      .slip-company{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;}
+      .slip-subtitle{font-size:11px;opacity:0.6;margin-top:2px;}
+      .slip-period-badge{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;}
+      .slip-body{padding:20px 26px;}
+      .slip-emp-section{background:#e0f2fe;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:grid;grid-template-columns:1fr 1fr;gap:10px;border:1px solid #bae6fd;}
+      .slip-field label{font-size:9px;color:#94a3b8;font-weight:700;letter-spacing:0.7px;text-transform:uppercase;}
+      .slip-field p{font-size:13px;font-weight:700;color:#334155;margin-top:2px;}
+      .slip-table{width:100%;border-collapse:collapse;}
+      .slip-table th{background:#f8fafc;padding:8px 12px;font-size:10px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0;text-align:left;text-transform:uppercase;}
+      .slip-table td{padding:9px 12px;font-size:13px;border-bottom:1px solid #f1f5f9;}
+      .slip-total{margin-top:12px;background:linear-gradient(135deg,#e0f9f0,#e0f2fe);border-radius:12px;padding:14px 18px;border:1px solid rgba(34,197,94,0.2);display:flex;justify-content:space-between;align-items:center;}
+      .slip-total-label{font-size:11px;color:#64748b;font-weight:700;}
+      .slip-total-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:#15803d;}
+      .slip-footer{padding:12px 26px;border-top:1px solid #f1f5f9;background:#f8fafc;text-align:center;font-size:11px;color:#94a3b8;font-style:italic;}
+      .flex{display:flex;}.between{justify-content:space-between;}.center{align-items:center;}
+      @media print{@page{margin:1cm}body{padding:0;background:white}}
+    </style>
+  </head><body>${content}</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),500);
+}
+
+function downloadSlipPDF(){showToast('🖨️ Membuka dialog cetak untuk simpan sebagai PDF...','info');setTimeout(printSlip,300);}
+function exportAllSlipPDF(){
+  if(!db.payrollHistory.length){showToast('⚠️ Belum ada riwayat gaji','error');return;}
+  const hist=db.payrollHistory[0];
+  showSlipBulk(hist.monthKey);
+  setTimeout(()=>{showToast('🖨️ Gunakan Ctrl+P → Save as PDF untuk menyimpan','info');},400);
+}
+function printMonthPayroll(mk){
+  const hist=db.payrollHistory.find(h=>h.monthKey===mk);
+  if(!hist)return;
+  let allSlips='';
+  for(const r of hist.records){
+    const emp=db.employees.find(e=>e.id===r.id)||r;
+    allSlips+=buildSlipHTML(r,emp,hist.monthName)+`<div style="height:20px"></div>`;
+  }
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8"><title>Slip Gaji ${hist.monthName}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:#f8fafc;padding:20px;}
+      .slip-print{background:white;border-radius:16px;border:2px solid #bae6fd;overflow:hidden;margin-bottom:30px;max-width:620px;margin:0 auto 30px;page-break-after:always;}
+      .slip-header{background:linear-gradient(135deg,#0c2d4e,#0369a1);color:white;padding:22px 28px;}
+      .slip-company{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;}
+      .slip-subtitle{font-size:11px;opacity:0.6;margin-top:2px;}
+      .slip-period-badge{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);border-radius:7px;padding:5px 12px;font-size:12px;font-weight:700;}
+      .slip-body{padding:22px 28px;}
+      .slip-emp-section{background:#e0f2fe;border-radius:12px;padding:14px 18px;margin-bottom:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px;border:1px solid #bae6fd;}
+      .slip-field label{font-size:9px;color:#94a3b8;font-weight:700;letter-spacing:0.7px;text-transform:uppercase;}
+      .slip-field p{font-size:13px;font-weight:700;color:#334155;margin-top:3px;}
+      .slip-table{width:100%;border-collapse:collapse;}
+      .slip-table th{background:#f8fafc;padding:9px 14px;font-size:10px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0;text-align:left;text-transform:uppercase;}
+      .slip-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid #f1f5f9;}
+      .slip-total{margin-top:14px;background:linear-gradient(135deg,#e0f9f0,#e0f2fe);border-radius:12px;padding:15px 18px;border:1px solid rgba(34,197,94,0.2);display:flex;justify-content:space-between;align-items:center;}
+      .slip-total-label{font-size:11px;color:#64748b;font-weight:700;}
+      .slip-total-value{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:#15803d;}
+      .slip-footer{padding:13px 28px;border-top:1px solid #f1f5f9;background:#f8fafc;text-align:center;font-size:11px;color:#94a3b8;font-style:italic;}
+      .flex{display:flex;}.between{justify-content:space-between;}.center{align-items:center;}
+      .fw700{font-weight:700;}
+      @media print{@page{margin:1.5cm}body{padding:0;background:white;}.slip-print{border-radius:0;}}
+    </style>
+  </head><body>${allSlips}</body></html>`);
+  w.document.close();
+  setTimeout(()=>{w.print();showToast('✅ Dialog cetak terbuka!','success');},500);
+}
+
+// ===== EXPORT CSV =====
+function downloadCSV(filename,rows){
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=filename;a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportCSV(){
+  const rows=[['ID','Nama','Jabatan','Gaji Pokok','Hadir Bulan Ini','Sakit','Alpa','Est. Gaji Bersih']];
+  for(const emp of db.employees){
+    const{hadir,sakit,alpa}=getMonthAtt(emp.id);
+    const{net}=calcNet(emp);
+    rows.push([emp.id,emp.name,emp.role,emp.salary,hadir,sakit,alpa,Math.round(net)]);
+  }
+  downloadCSV(`karyawan_${monthKey()}.csv`,rows);
+  showToast('📊 CSV karyawan diunduh!','success');
+}
+
+function exportAttCSV(){
+  const mk=monthKey();
+  const rows=[['Tanggal',...db.employees.map(e=>e.name)]];
+  const days=daysInMonth(mk);
+  const[y,m]=mk.split('-');
+  for(let d=1;d<=days;d++){
+    const fullDk=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayData=db.attendance[`${mk}-${fullDk}`]||{};
+    rows.push([fullDk,...db.employees.map(e=>dayData[e.id]||'—')]);
+  }
+  downloadCSV(`absensi_${mk}.csv`,rows);
+  showToast('📋 CSV absensi diunduh!','success');
+}
+
+function exportAttPDF(){showToast('🖨️ Gunakan Ctrl+P untuk cetak halaman ini','info');}
+
+function exportPayrollCSV(){
+  if(!db.payrollHistory.length){showToast('⚠️ Belum ada riwayat gaji','error');return;}
+  const rows=[['Periode','Nama','Jabatan','Gaji Pokok','Potongan Alpa','Potongan Sakit','Gaji Bersih','Hadir','Sakit','Alpa']];
+  for(const h of db.payrollHistory){
+    for(const r of h.records){
+      rows.push([h.monthName,r.name,r.role,r.base,Math.round(r.cutAlpa),Math.round(r.cutSakit),Math.round(r.net),r.hadir||0,r.sakit||0,r.alpa||0]);
+    }
+  }
+  downloadCSV('riwayat_penggajian.csv',rows);
+  showToast('💰 CSV penggajian diunduh!','success');
+}
+
+// ===== PENGATURAN =====
+function renderPengaturan(){
+  let html='';
+  for(const emp of db.employees){
+    const c=getColor(emp);
+    html+=`<div style="border:1px solid var(--gray100);border-radius:12px;padding:14px;margin-bottom:12px;transition:var(--trans);" onmouseover="this.style.borderColor='var(--sky-l)'" onmouseout="this.style.borderColor='var(--gray100)'">
+      <div class="flex center gap12 mb12">
+        <div style="width:36px;height:36px;border-radius:10px;background:${c.bg};color:${c.fg};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">${initials(emp.name)}</div>
+        <div class="fw800 text-sm">${emp.name} <span class="text-xs text-muted fw600">(${emp.role})</span></div>
+      </div>
+      <div class="form-group mb8">
+        <label class="form-label">Nama</label>
+        <input class="input" id="sname-${emp.id}" value="${emp.name}">
+      </div>
+      <div class="form-group mb8">
+        <label class="form-label">Jabatan</label>
+        <input class="input" id="srole-${emp.id}" value="${emp.role}">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Gaji Pokok</label>
+        <input class="input input-mono" type="number" id="ssal-${emp.id}" value="${emp.salary}">
+      </div>
+    </div>`;
+  }
+  document.getElementById('settings-list').innerHTML=html;
+}
+
+function saveSettings(){
+  for(const emp of db.employees){
+    const n=document.getElementById('sname-'+emp.id)?.value.trim();
+    const r=document.getElementById('srole-'+emp.id)?.value.trim();
+    const s=parseInt(document.getElementById('ssal-'+emp.id)?.value);
+    if(n)emp.name=n;if(r)emp.role=r;if(!isNaN(s)&&s>0)emp.salary=s;
+  }
+  save();showToast('✅ Pengaturan disimpan!','success');
+}
+
+function resetData(){
+  if(!confirm('Reset semua data? Absensi & riwayat gaji akan terhapus permanen.'))return;
+  db={employees:JSON.parse(JSON.stringify(DEFAULTS)),attendance:{},payrollHistory:[]};
+  save();showToast('🔄 Data direset!','info');showPage('dashboard');
+}
+
+// ===== MODALS =====
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
+});
+
+// ===== TOAST =====
+let toastTimer;
+function showToast(msg,type='info'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast toast-'+type+' show';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ===== COUNTER ANIMATION =====
+function animateCounter(el,target,duration=800){
+  const start=Date.now();
+  const initial=0;
+  const update=()=>{
+    const elapsed=Date.now()-start;
+    const progress=Math.min(elapsed/duration,1);
+    const ease=1-Math.pow(1-progress,3);
+    el.textContent=Math.round(initial+(target-initial)*ease).toLocaleString('id-ID');
+    if(progress<1)requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+</script>
+</body>
+</html>
