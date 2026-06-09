@@ -8,9 +8,7 @@ Proyek ini dibuat sebagai sistem manajemen penggajian yang dapat dijalankan lang
 
 ## Link Akses Website
 
-
-https://aidilfarhanr-sketch.github.io/Sistem-Penggajian/
-
+[Buka Sistem Penggajian](https://aidilfarhanr-sketch.github.io/Sistem-Penggajian/)
 
 
 ---
